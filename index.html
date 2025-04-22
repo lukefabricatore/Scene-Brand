@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en" xml:lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="Content-Language" content="en" />
+        <meta name="google" content="notranslate" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Scene Brand</title>
+        <link rel="stylesheet" href="styles.css" />
+
+        <!-- FONTS -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wdth,wght@0,75..100,400..700;1,75..100,400..700&family=Instrument+Serif:ital@0;1&display=swap"
+            rel="stylesheet"
+        />
+    </head>
+    <body>
+        <section id="about">
+            <h1>Scene</h1>
+            <p>Lorem ipsum dolar sit amet</p>
+        </section>
+        <div id="textbox_container" active="0">
+            <canvas id="textbox" width="200" height="130"></canvas>
+            <div class="move_textbox top_bar"></div>
+            <div class="move_textbox"></div>
+            <button class="textbox_button next" state="fast"></button>
+            <button class="textbox_button exit"></button>
+        </div>
+        <section id="panels"></section>
+        <section id="metadata"></section>
+        <script src="data.js"></script>
+        <script src="main.js"></script>
+        <script src="dialogue.js"></script>
+    </body>
+</html>
