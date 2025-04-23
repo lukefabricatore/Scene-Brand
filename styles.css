@@ -324,6 +324,17 @@ button.inline_button {
     position: relative;
     transition: transform 0.2s cubic-bezier(0.17, 0.67, 0.29, 2.71);
 }
+button.inline_button p {
+    color: white;
+}
+button.inline_button.emphasis {
+    background: #ff9d0033;
+    border: none;
+}
+button.inline_button.emphasis p {
+    color: var(--energyburst);
+}
+
 button.inline_button a {
     all: unset;
     position: absolute;
@@ -339,6 +350,12 @@ button.inline_button a {
     button.inline_button:active {
         transform: scale(0.98);
     }
+    button.inline_button.emphasis:hover {
+        background: var(--energyburst);
+    }
+    button.inline_button.emphasis:hover p {
+        color: black;
+    }
 }
 @media (hover: none) {
     button.inline_button:active {
@@ -346,6 +363,12 @@ button.inline_button a {
     }
     button.inline_button:active {
         transform: scale(0.98);
+    }
+    button.inline_button.emphasis:active {
+        background: var(--energyburst);
+    }
+    button.inline_button.emphasis:active p {
+        color: black;
     }
 }
 button.inline_button p {
@@ -360,18 +383,100 @@ button.inline_button .tab svg path {
 }
 .button_tabs {
     display: inline-block;
-    margin-left: 20px;
+    margin-left: 10px;
 }
 .button_tabs .tab {
     display: inline-block;
-    padding: 20px 5px;
-    margin: -20px 0 -20px 10px;
+    width: 28px;
+    text-align: center;
+    position: relative;
+    height: 46px;
+    box-sizing: border-box;
+    margin: -20px 0 -26px 7px;
+}
+.button_tabs .tab div {
+    top: 0;
+    position: absolute;
 }
 .button_tabs .tab.active {
     border-bottom: 2px solid var(--energyburst);
 }
 .button_tabs .tab.active svg path {
     fill: var(--energyburst);
+}
+
+/* ******************* */
+/* ******************* */
+/* ******************* */
+/* BUTTON STRIP */
+/* ******************* */
+/* ******************* */
+/* ******************* */
+
+.button_strip {
+    display: flex;
+    width: 100%;
+    margin: 0 0 25px;
+    position: relative;
+}
+.button_strip::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    height: 40%;
+    width: 2px;
+    top: 30%;
+    opacity: 0.2;
+    background-color: var(--energyburst);
+}
+.button_strip button {
+    all: unset;
+    display: inline-block;
+    text-align: center;
+    padding: 12px 20px;
+    color: var(--energyburst);
+    position: relative;
+    cursor: pointer;
+}
+.button_strip button div {
+    color: var(--energyburst);
+}
+.button_strip button::after {
+    content: "";
+    position: absolute;
+    right: -1px;
+    height: 40%;
+    width: 2px;
+    top: 30%;
+    opacity: 0.2;
+    background-color: var(--energyburst);
+}
+.button_strip button::before {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 4px;
+    height: calc(100% - 8px);
+    width: calc(100% - 8px);
+    opacity: 0;
+    background-color: var(--energyburst);
+    border-radius: 6px;
+    transition: transform 0.2s cubic-bezier(0.17, 0.67, 0.29, 2.71);
+}
+@media (hover: hover) {
+    .button_strip button:hover::before {
+        opacity: 0.1;
+        transform: scale(1.02);
+    }
+    .button_strip button:active::before {
+        transform: scale(0.98);
+    }
+}
+@media (hover: none) {
+    .button_strip button:active::before {
+        opacity: 0.1;
+        transform: scale(1.02);
+    }
 }
 
 /* ******************* */
@@ -877,11 +982,10 @@ button.inline_button .tab svg path {
 .panel#instrument .open_content {
     padding: 36px;
 }
-.panel#instrument .open_content p {
+.panel#instrument .open_content p.caption {
     color: white;
 }
-.panel#instrument textarea {
-    font-family: "Instrument Serif";
+textarea {
     font-size: 74px;
     color: white;
     background: none;
@@ -891,10 +995,27 @@ button.inline_button .tab svg path {
     width: 100%;
     line-height: 1;
     margin: 20px 0 30px -5px;
+    height: 160px;
+}
+.panel#instrument textarea {
+    font-family: "Instrument Serif";
 }
 .panel#instrument textarea[version="sans"] {
     font-family: "Instrument Sans";
     font-variation-settings: "wdth" 75;
+}
+
+/* ANALOGIE PANEL */
+.panel#analogie .open_content {
+    padding: 36px;
+}
+.panel[id="analogie"] .open_content p.caption {
+    color: white;
+}
+.panel#analogie textarea {
+    font-family: "Analogie";
+    text-rendering: geometricPrecision;
+    height: 145px;
 }
 
 /* ******************* */

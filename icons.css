@@ -1,0 +1,74 @@
+@font-face {
+  font-family: 'Scene Icons';
+  src: url('assets/global/scene-icons.ttf?vyp9a8') format('truetype'),
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="scene"], [class*=" scene"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'Scene Icons' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  color: white;
+  font-size: 28px;
+  height: 28px;
+  width: 28px;
+  text-align: center;
+  text-rendering: geometricPrecision;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.scene1px:before {
+  content: "\e900";
+}
+.scene2d:before {
+  content: "\e901";
+}
+.scene3d:before {
+  content: "\e902";
+}
+.sceneaction-vertical:before {
+  content: "\e903";
+}
+.sceneaction:before {
+  content: "\e904";
+}
+.scenearrow-left:before {
+  content: "\e905";
+}
+.scenearrow-right:before {
+  content: "\e906";
+}
+.scenebullet:before {
+  content: "\e907";
+}
+.scenedownload:before {
+  content: "\e908";
+}
+.sceneflame:before {
+  content: "\e909";
+}
+.sceneloop:before {
+  content: "\e90a";
+}
+.sceneportal:before {
+  content: "\e90b";
+}
+.scenesans:before {
+  content: "\e90c";
+}
+.sceneserif:before {
+  content: "\e90d";
+}
+.scenesprout:before {
+  content: "\e90e";
+}

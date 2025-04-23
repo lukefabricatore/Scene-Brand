@@ -267,7 +267,6 @@ function checkDownloadButtons() {
 // INDIVIDUAL SETUPS
 
 function setupInstrument() {
-  console.log("setupInstrument called");
   let panel = document.querySelector(".panel#instrument");
   panel.querySelector(".open_content").setAttribute("needs_corners", "true");
   panel
@@ -277,6 +276,40 @@ function setupInstrument() {
       panel.querySelector("textarea").setAttribute("version", nextTab);
     });
 }
+function setupAnalogie() {
+  let panel = document.querySelector(".panel#analogie");
+  panel.querySelector(".open_content").setAttribute("needs_corners", "true");
+  panel.querySelector("textarea").addEventListener("input", () => {
+    let text = event.currentTarget.value;
+    text = replaceSceneSprouts(text);
+    event.currentTarget.value = text;
+  });
+  const stripButtons = panel
+    .querySelector(".button_strip")
+    .querySelectorAll("button");
+  function replaceSceneSprouts(text) {
+    text = text.replace(/▤(?=▢)/g, "▥");
+    text = text.replace(/▥(?=[^▢])/g, "▤");
+    return text;
+  }
+  for (const button of stripButtons) {
+    button.addEventListener("click", (event) => {
+      const content = event.currentTarget.getAttribute("char");
+      const textarea = panel.querySelector("textarea");
+      let start = textarea.selectionStart;
+      let end = textarea.selectionEnd;
+      let text = textarea.value;
+      text = text.slice(0, start) + content + text.slice(end);
+      start += content.length;
+      text = replaceSceneSprouts(text);
+      textarea.value = text;
+      textarea.selectionStart = textarea.selectionEnd = start;
+      textarea.focus();
+    });
+  }
+}
+
+// TAB BUTTONS
 
 function getTabInfo(container) {
   const activeTab = container.querySelector(".tab.active");

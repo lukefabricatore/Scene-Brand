@@ -54,8 +54,8 @@ const gridItems = [
       },
     },
     open: {
-      desk: [650, 345],
-      mob: [650, 345],
+      desk: [650, 360],
+      mob: [650, 360],
     },
     content: {
       html: `
@@ -73,8 +73,8 @@ const gridItems = [
       mob: { size: [5, 3], pos: [5, 0], endPos: [15, 0] },
     },
     open: {
-      desk: [650, 300],
-      mob: [650, 300],
+      desk: [650, 430],
+      mob: [650, 430],
     },
     content: {
       background: "#2B3400",
@@ -246,20 +246,13 @@ const openPanelData = {
       ],
     },
     html: `
-      <p>START TYPING BELOW</p>
+      <p class="caption">START TYPING BELOW</p>
       <textarea placeholder="Hello World. This is Instrument"></textarea>
       <button class='inline_button tab_button'>
         <p>SHIFT</p>
         <div class="button_tabs">
-          <div class="tab active" tab="serif">
-            <svg viewBox="0 0 5 9" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M4.04297 0.964844V2.95869H3.04821V1.96177H1.05437V4.95145H2.04913V3.95453H3.04821V6.94421H2.04913V5.94729H1.05437V7.94113H2.04913V8.93697H0.055283V0.964844H4.04297Z" fill="black"/>
-            </svg>
-          </div><div class="tab" tab="sans">
-            <svg viewBox="0 0 5 9" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M4.44531 0.961914V1.95884H1.45671V4.94744H3.45055V5.94436H1.45671V8.93404H0.457627V0.961914H4.44531Z" fill="black"/>
-            </svg>
-          </div>
+          <div class="tab active" tab="serif"><div class="sceneserif"></div>
+          </div><div class="tab" tab="sans"><div class="scenesans"></div></div>
         </div>
       </button><button class='inline_button emphasis'>
         <p>GET GOOGLE FONT</p>
@@ -280,6 +273,29 @@ const openPanelData = {
         "So we'll tell it.",
       ],
     },
+    html: `
+      <p class="caption">START TYPING BELOW</p>
+      <textarea placeholder="Analogie is your best friend."></textarea>
+      <div class="button_strip">
+        <button char="▤"><div class="scenesprout"></div></button>
+        <button char="▢"><div class="sceneloop"></div></button>
+        <button char="▣"><div class="sceneportal"></div></button>
+        <button char="□"><div class="sceneflame"></div></button>
+        <button char="■"><div class="sceneaction"></div></button>
+        <button char="←"><div class="scenearrow-left"></div></button>
+        <button char="→"><div class="scenearrow-right"></div></button>
+      </div>
+      <button class='inline_button'>
+        <p>GET TYPE SHEET</p>
+        <a href="assets/global/analogie.ttf" download></a>
+      </button><button class='inline_button emphasis'>
+        <p>GET TTF</p>
+        <a href="assets/global/analogie.ttf" download></a>
+      </button>
+    `,
+    action: function () {
+      setupAnalogie();
+    },
   },
   dynamics: {
     dialogue: {
@@ -291,6 +307,7 @@ const openPanelData = {
         "So we'll tell it.",
       ],
     },
+    html: {},
   },
   runes: {
     dialogue: {
