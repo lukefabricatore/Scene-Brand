@@ -54,8 +54,8 @@ const gridItems = [
       },
     },
     open: {
-      desk: [650, 360],
-      mob: [650, 360],
+      desk: [650, 345],
+      mob: [650, 345],
     },
     content: {
       html: `
@@ -73,8 +73,8 @@ const gridItems = [
       mob: { size: [5, 3], pos: [5, 0], endPos: [15, 0] },
     },
     open: {
-      desk: [650, 430],
-      mob: [650, 430],
+      desk: [650, 410],
+      mob: [650, 410],
     },
     content: {
       background: "#2B3400",
@@ -101,8 +101,8 @@ const gridItems = [
       mob: { size: [8, 2], pos: [2, 3], endPos: [12, 3] },
     },
     open: {
-      desk: [650, 300],
-      mob: [650, 300],
+      desk: [500, 370],
+      mob: [500, 370],
     },
     content: {
       video: {
@@ -307,7 +307,43 @@ const openPanelData = {
         "So we'll tell it.",
       ],
     },
-    html: {},
+    html: `
+      <div id="dynamic_logo_container">
+          <div class="guide_lines">
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+          </div>
+        <h1 class="no_highlight">A</h1>
+      </div>
+      <div class="custom_slider no_highlight">
+          <div class="track"></div>
+          <button class="inline_button slider_button" type="subtract"><div class="scenesubtract"></div></button>
+          <div class="slider_fill_container">
+            <div class="slider_fill"><p>100</p></div>
+            <div class="notches">
+                <div class="notch"></div>
+                <div class="notch"></div>
+                <div class="notch"></div>
+            </div>
+            <div class="handle_zone"></div>
+          </div>
+          <button class="inline_button slider_button" type="add"><div class="sceneadd"></div></button>
+      </div>
+      <button download_button='assets/downloads/dynamics/100.svg' download_name='scene_100.svg' class='inline_button emphasis white' id='runes_svg_button'>
+        <p>GET SVG</p>
+      </button><button class='inline_button'>
+        <p>GET PNG</p>
+      </button>
+      <button class='inline_button'>
+        <p>GET TTF</p>
+        <a href="assets/global/scene_runes.ttf" download></a>
+      </button>
+    `,
+    action: function () {
+      setupDynamics();
+    },
   },
   runes: {
     dialogue: {

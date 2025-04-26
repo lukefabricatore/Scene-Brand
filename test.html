@@ -2,596 +2,345 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <title>Retro RPG Text Box</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Interactive Vertical Textbox</title>
         <style>
             body {
-                background: gray;
+                font-family: sans-serif;
+                padding: 20px;
             }
-            #textbox_container {
-                width: 500px;
-                position: absolute; /* required for moving */
-                user-select: none;
-                touch-action: none; /* prevents weird iOS scrolling while dragging */
+            .canvas-wrapper {
+                position: relative;
+                display: inline-block;
+                margin-top: 20px;
             }
-            #textbox_container[active="0"] {
-                display: none;
-            }
-            #textbox_container canvas {
-                background: #000;
-                image-rendering: pixelated;
+            svg {
+                border: 1px solid #ccc;
                 display: block;
-                width: 100%;
+                cursor: text;
             }
-            #textbox_container .move_textbox {
+            #clickableContainer {
                 position: absolute;
-                top: 13%;
-                left: 0;
-                width: 100%;
-                height: 72%;
-                cursor: grab;
-            }
-            #textbox_container .move_textbox.top_bar {
                 top: 0;
-                width: 92%;
-                height: 13%;
+                left: 0;
+                pointer-events: none;
             }
-            #textbox_container .textbox_button {
-                all: unset;
-                position: absolute;
-                cursor: pointer;
+            #clickableContainer div {
+                cursor: text;
             }
-            #textbox_container .textbox_button.next {
-                bottom: 2%;
-                right: 1%;
-                width: 14%;
-                height: 13%;
-            }
-            #textbox_container .textbox_button.exit {
-                top: 0%;
-                right: 0%;
-                width: 8%;
-                height: 13%;
-            }
-            @media (hover: hover) {
-                #textbox_container .textbox_button:hover {
-                    background: #ffffff30;
+            @keyframes blink {
+                0% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0;
+                }
+                100% {
+                    opacity: 1;
                 }
             }
-            #textbox_container .textbox_button:active {
-                background: white;
+            .cursor {
+                animation: blink 1s 0.3s step-start infinite;
+                fill: #ff9d00;
+            }
+            .highlight {
+                fill: rgba(100, 100, 255, 0.5);
+            }
+            .highlight-all {
+                fill: rgba(150, 150, 255, 0.3);
             }
         </style>
     </head>
     <body>
-        <div id="textbox_container" active="1">
-            <canvas id="textbox" width="200" height="130"></canvas>
-            <div class="move_textbox top_bar"></div>
-            <div class="move_textbox"></div>
-            <button class="textbox_button next" state="fast"></button>
-            <button class="textbox_button exit"></button>
+        <h1>Interactive Vertical Textbox</h1>
+
+        <label>Spacing (in pixels):</label>
+        <input id="spacingInput" type="number" value="1" />
+
+        <label>Scale (integer, 1 = 0.01, 10 = 0.1, 20 = 0.2, etc):</label>
+        <input id="scaleInput" type="number" value="5" />
+
+        <div class="buttons">
+            <button onclick="insertSpecialChar('■')">■</button>
+            <button onclick="insertSpecialChar('▤')">▤</button>
+            <button onclick="insertSpecialChar('▢')">▢</button>
         </div>
 
+        <div class="canvas-wrapper">
+            <div id="svgContainer"></div>
+            <div id="clickableContainer"></div>
+        </div>
+
+        <script src="data.js"></script>
+
         <script>
-            const textBoxCanvas = document.getElementById("textbox");
-            const textBoxCtx = textBoxCanvas.getContext("2d");
+            const defaultLetterHeight = 720;
+            const defaultLetterWidth = 320;
+            const pixelSize = 80;
+            let text = "";
+            let cursorIndex = 0;
+            let selectionStart = null;
+            let selectionEnd = null;
 
-            // Config
-            const textBoxNextButton = document.querySelector(
-                ".textbox_button.next",
-            );
-            const textBoxLetterWidth = 4;
-            const textBoxLetterHeight = 9;
-            const textBoxPathBaseHeight = 720;
-            const textBoxLetterSpacingUnits = 80;
-            const textBoxScale = textBoxLetterHeight / textBoxPathBaseHeight;
-            const textBoxSpacingPx = textBoxLetterSpacingUnits * textBoxScale;
-            const textBoxLineHeightPx = textBoxLetterHeight + 3;
-            const textBoxCanvasPadding = 7;
-            let textBoxCharDelay = 10;
-
-            function textBoxGetLetterSize(char) {
-                const rawW = letterWidths[char] || letterWidths.default || 320;
-                const rawH =
-                    letterHeights[char] ||
-                    letterHeights.default ||
-                    textBoxPathBaseHeight;
-
-                return {
-                    width: rawW * textBoxScale,
-                    height: rawH * textBoxScale,
-                    rawHeight: rawH,
-                };
+            function isMetaKeyPressed(e) {
+                return e.ctrlKey || e.metaKey;
             }
 
-            function textBoxDrawLetter(char, x, y) {
-                const pathData = letterPaths[char];
-                if (!pathData) return;
+            function generateSVG() {
+                const spacing =
+                    parseInt(document.getElementById("spacingInput").value) ||
+                    0;
+                const scaleInputValue =
+                    parseInt(document.getElementById("scaleInput").value) || 10;
+                const scale = scaleInputValue * 0.01;
 
-                const { rawHeight } = textBoxGetLetterSize(char);
-                const baselineOffset =
-                    textBoxLetterHeight - rawHeight * textBoxScale;
+                let yOffset = 0;
+                let svgContent = "";
+                let highlightContent = "";
+                let maxWidth = 0;
+                const elements = [];
 
-                textBoxCtx.save();
-                textBoxCtx.translate(x, y + baselineOffset);
-                textBoxCtx.scale(textBoxScale, textBoxScale);
-                textBoxCtx.fillStyle = "#FFF";
-                textBoxCtx.fill(new Path2D(pathData));
-                textBoxCtx.restore();
-            }
+                const chars = text.length > 0 ? text.split("") : ["_"];
 
-            function textBoxDrawText(
-                text,
-                startX = textBoxCanvasPadding,
-                startY = textBoxCanvasPadding + 16,
-            ) {
-                textBoxCtx.clearRect(
-                    0,
-                    0,
-                    textBoxCanvas.width,
-                    textBoxCanvas.height,
-                );
-                textBoxNextButton.setAttribute("state", "fast");
-                textBoxCharDelay = 10;
-                textBoxDrawNextButton("Fast");
-                textBoxDrawTopBar("▤Scene");
+                for (let i = 0; i < chars.length; i++) {
+                    const char = chars[i];
+                    const nextChar = chars[i + 1];
+                    const isLastChar = i === chars.length - 1;
 
-                const words = text.split(/(\s+)/);
-                let wordIndex = 0;
-                let x = startX;
-                let y = startY;
+                    if (!letterPaths[char] && char !== " ") continue;
 
-                function measureWord(word) {
-                    return word.split("").reduce((total, char) => {
-                        const { width } = textBoxGetLetterSize(char);
-                        return total + width + textBoxSpacingPx;
-                    }, 0);
-                }
+                    const pathData = letterPaths[char] || "";
+                    const letterHeight =
+                        letterHeights[char] ||
+                        letterHeights.space ||
+                        defaultLetterHeight;
+                    const letterWidth =
+                        letterWidths[char] || defaultLetterWidth;
 
-                function drawWord(word, callback) {
-                    let charIndex = 0;
+                    elements.push({
+                        pathData,
+                        yOffset,
+                        letterWidth,
+                        letterHeight,
+                    });
+                    if (letterWidth > maxWidth) maxWidth = letterWidth;
 
-                    function drawNextChar() {
-                        if (charIndex >= word.length) {
-                            callback();
-                            return;
-                        }
-
-                        const char = word[charIndex];
-                        const { width } = textBoxGetLetterSize(char);
-
-                        if (!(char === " " && x === startX)) {
-                            textBoxDrawLetter(char, x, y);
-                            x += width + textBoxSpacingPx;
-                        }
-
-                        charIndex++;
-                        if (textBoxCharDelay === 0) {
-                            drawNextChar();
-                        } else {
-                            setTimeout(drawNextChar, textBoxCharDelay);
+                    yOffset += letterHeight;
+                    if (!isLastChar) {
+                        if (!(char === "■" && nextChar === "■")) {
+                            yOffset += spacing * pixelSize;
                         }
                     }
-
-                    drawNextChar();
                 }
 
-                function drawNextWord() {
-                    if (wordIndex >= words.length) {
-                        textBoxDrawNextButton("Next");
-                        textBoxNextButton.setAttribute("state", "next");
-                        return;
-                    }
+                const totalHeight = yOffset || 720;
 
-                    const word = words[wordIndex];
-                    const wordWidth = measureWord(word);
-
-                    if (
-                        x + wordWidth >
-                        textBoxCanvas.width - textBoxCanvasPadding
-                    ) {
-                        x = textBoxCanvasPadding;
-                        y += textBoxLineHeightPx;
-
+                if (selectionStart === 0 && selectionEnd === text.length) {
+                    highlightContent += `<rect class="highlight-all" x="0" y="0" width="${maxWidth}" height="${totalHeight}" />\n`;
+                } else {
+                    for (let i = 0; i < elements.length; i++) {
+                        const { yOffset, letterHeight } = elements[i];
                         if (
-                            y + textBoxLetterHeight >
-                            textBoxCanvas.height - textBoxCanvasPadding
-                        )
-                            return;
-
-                        if (/^\s+$/.test(word)) {
-                            wordIndex++;
-                            drawNextWord();
-                            return;
+                            selectionStart !== null &&
+                            selectionEnd !== null &&
+                            i >= Math.min(selectionStart, selectionEnd) &&
+                            i < Math.max(selectionStart, selectionEnd)
+                        ) {
+                            highlightContent += `<rect class="highlight" x="0" y="${yOffset}" width="${maxWidth}" height="${letterHeight}" />\n`;
                         }
                     }
+                }
 
-                    drawWord(word, () => {
-                        wordIndex++;
-                        drawNextWord();
+                for (let i = 0; i < elements.length; i++) {
+                    const { pathData, yOffset, letterWidth } = elements[i];
+                    const xOffset = (maxWidth - letterWidth) / 2;
+                    if (pathData) {
+                        svgContent += `<path d="${pathData}" transform="translate(${xOffset},${yOffset})" />\n`;
+                    }
+                }
+
+                let cursorYOffset = 0;
+                for (let i = 0; i < cursorIndex; i++) {
+                    const char = text[i];
+                    const nextChar = text[i + 1];
+                    const letterHeight =
+                        letterHeights[char] ||
+                        letterHeights.space ||
+                        defaultLetterHeight;
+                    cursorYOffset += letterHeight;
+                    if (!(char === "■" && nextChar === "■")) {
+                        cursorYOffset += spacing * pixelSize;
+                    }
+                }
+                cursorYOffset = Math.min(
+                    Math.max(0, cursorYOffset - 80),
+                    totalHeight - 80,
+                );
+
+                const svg = `
+    <svg id="svgTextbox" width="${maxWidth * scale}" height="${totalHeight * scale}" viewBox="0 0 ${maxWidth} ${totalHeight}" xmlns="http://www.w3.org/2000/svg">
+      <g transform="scale(1)">
+        ${highlightContent}
+        ${svgContent}
+        <rect x="${(maxWidth - 320) / 2}" y="${cursorYOffset}" width="320" height="80" class="cursor" />
+      </g>
+    </svg>
+  `;
+
+                document.getElementById("svgContainer").innerHTML = svg;
+
+                let clickableHTML = "";
+                for (let i = 0; i <= elements.length; i++) {
+                    let top = 0;
+                    let height = 0;
+                    if (i === 0) {
+                        top = 0;
+                        height = elements[0]
+                            ? elements[0].letterHeight / 2
+                            : 40;
+                    } else if (i === elements.length) {
+                        const prev = elements[i - 1];
+                        top = prev.yOffset + prev.letterHeight / 2;
+                        height = prev.letterHeight / 2;
+                    } else {
+                        const prev = elements[i - 1];
+                        const next = elements[i];
+                        top = prev.yOffset + prev.letterHeight / 2;
+                        height = next.yOffset + next.letterHeight / 2 - top;
+                    }
+                    clickableHTML += `<div style="position:absolute;left:0;top:${top * scale}px;width:${maxWidth * scale}px;height:${height * scale}px;pointer-events:all;" data-index="${i}"></div>`;
+                }
+
+                document.getElementById("clickableContainer").innerHTML =
+                    clickableHTML;
+                document.getElementById("clickableContainer").style.width =
+                    `${maxWidth * scale}px`;
+                document.getElementById("clickableContainer").style.height =
+                    `${totalHeight * scale}px`;
+
+                document
+                    .querySelectorAll("#clickableContainer div")
+                    .forEach((div) => {
+                        div.addEventListener("click", (e) => {
+                            cursorIndex = parseInt(
+                                e.target.getAttribute("data-index"),
+                            );
+                            selectionStart = null;
+                            selectionEnd = null;
+                            generateSVG();
+                        });
+                    });
+            }
+
+            document
+                .getElementById("spacingInput")
+                .addEventListener("input", generateSVG);
+            document
+                .getElementById("scaleInput")
+                .addEventListener("input", generateSVG);
+
+            document.addEventListener("keydown", (e) => {
+                if (e.key.length === 1 && !isMetaKeyPressed(e)) {
+                    if (text.length >= 50) return;
+                    if (selectionStart !== null && selectionEnd !== null) {
+                        const min = Math.min(selectionStart, selectionEnd);
+                        const max = Math.max(selectionStart, selectionEnd);
+                        text = text.slice(0, min) + e.key + text.slice(max);
+                        cursorIndex = min + 1;
+                        selectionStart = selectionEnd = null;
+                    } else {
+                        text =
+                            text.slice(0, cursorIndex) +
+                            e.key +
+                            text.slice(cursorIndex);
+                        cursorIndex++;
+                    }
+                    generateSVG();
+                } else if (e.key === "Backspace") {
+                    if (selectionStart !== null && selectionEnd !== null) {
+                        const min = Math.min(selectionStart, selectionEnd);
+                        const max = Math.max(selectionStart, selectionEnd);
+                        text = text.slice(0, min) + text.slice(max);
+                        cursorIndex = min;
+                        selectionStart = selectionEnd = null;
+                    } else if (cursorIndex > 0) {
+                        text =
+                            text.slice(0, cursorIndex - 1) +
+                            text.slice(cursorIndex);
+                        cursorIndex--;
+                    }
+                    generateSVG();
+                } else if (e.key === "Delete") {
+                    if (cursorIndex < text.length) {
+                        text =
+                            text.slice(0, cursorIndex) +
+                            text.slice(cursorIndex + 1);
+                        generateSVG();
+                    }
+                } else if (e.key === "ArrowUp") {
+                    if (cursorIndex > 0) {
+                        cursorIndex--;
+                        generateSVG();
+                    }
+                } else if (e.key === "ArrowDown") {
+                    if (cursorIndex < text.length) {
+                        cursorIndex++;
+                        generateSVG();
+                    }
+                } else if (isMetaKeyPressed(e) && e.key.toLowerCase() === "a") {
+                    e.preventDefault();
+                    selectionStart = 0;
+                    selectionEnd = text.length;
+                    generateSVG();
+                } else if (isMetaKeyPressed(e) && e.key.toLowerCase() === "c") {
+                    if (selectionStart !== null && selectionEnd !== null) {
+                        const min = Math.min(selectionStart, selectionEnd);
+                        const max = Math.max(selectionStart, selectionEnd);
+                        navigator.clipboard.writeText(text.slice(min, max));
+                    }
+                } else if (isMetaKeyPressed(e) && e.key.toLowerCase() === "v") {
+                    navigator.clipboard.readText().then((clipText) => {
+                        if (text.length + clipText.length > 50)
+                            clipText = clipText.slice(0, 50 - text.length);
+                        if (selectionStart !== null && selectionEnd !== null) {
+                            const min = Math.min(selectionStart, selectionEnd);
+                            const max = Math.max(selectionStart, selectionEnd);
+                            text =
+                                text.slice(0, min) + clipText + text.slice(max);
+                            cursorIndex = min + clipText.length;
+                            selectionStart = selectionEnd = null;
+                        } else {
+                            text =
+                                text.slice(0, cursorIndex) +
+                                clipText +
+                                text.slice(cursorIndex);
+                            cursorIndex += clipText.length;
+                        }
+                        generateSVG();
                     });
                 }
+            });
 
-                drawNextWord();
+            function insertSpecialChar(char) {
+                if (text.length >= 50) return;
+                if (selectionStart !== null && selectionEnd !== null) {
+                    const min = Math.min(selectionStart, selectionEnd);
+                    const max = Math.max(selectionStart, selectionEnd);
+                    text = text.slice(0, min) + char + text.slice(max);
+                    cursorIndex = min + 1;
+                    selectionStart = selectionEnd = null;
+                } else {
+                    text =
+                        text.slice(0, cursorIndex) +
+                        char +
+                        text.slice(cursorIndex);
+                    cursorIndex++;
+                }
+                generateSVG();
             }
 
-            function textBoxDrawTopBar(title) {
-                const barHeight = textBoxLetterHeight + 8;
-                const barY = 0;
-
-                const ctx = textBoxCtx;
-                const canvas = textBoxCanvas;
-
-                ctx.save();
-                ctx.fillStyle = "#000";
-                ctx.fillRect(0, barY, canvas.width, barHeight);
-                ctx.fillStyle = "#fff";
-                for (let i = 0; i < 5; i++) {
-                    ctx.fillRect(4, 4 + i * 2, canvas.width - 23, 1);
-                }
-
-                ctx.strokeStyle = "#fff";
-                ctx.lineWidth = 1;
-                ctx.strokeRect(0.5, 0.5, canvas.width - 1, barHeight - 1);
-                ctx.strokeRect(0.5, 0.5, canvas.width - 1, canvas.height - 1);
-                ctx.fillStyle = "#000";
-                ctx.strokeRect(canvas.width - 15.5, 0.5, 15, 16);
-                ctx.strokeRect(canvas.width - 13.5, 2.5, 11, 12);
-                ctx.restore();
-
-                textBoxDrawLetter("x", canvas.width - 10, 3);
-
-                const textWidth = title.split("").reduce((sum, char) => {
-                    const { width } = textBoxGetLetterSize(char);
-                    return sum + width + textBoxSpacingPx;
-                }, -textBoxSpacingPx);
-
-                const textX = Math.floor((canvas.width - textWidth) / 2);
-                const textY = Math.floor((barHeight - textBoxLetterHeight) / 2);
-
-                ctx.clearRect(
-                    textX - 4,
-                    textY - 2,
-                    textWidth + 8,
-                    textBoxLetterHeight + 4,
-                );
-
-                let drawX = textX;
-                for (let i = 0; i < title.length; i++) {
-                    const char = title[i];
-                    textBoxDrawLetter(char, drawX, textY);
-                    const { width } = textBoxGetLetterSize(char);
-                    drawX += width + textBoxSpacingPx;
-                }
-            }
-
-            function textBoxDrawNextButton(label = "→") {
-                const ctx = textBoxCtx;
-                const canvas = textBoxCanvas;
-
-                ctx.clearRect(1, canvas.height - 20, canvas.width - 2, 19);
-
-                const labelWidth = label.split("").reduce((sum, char) => {
-                    const { width } = textBoxGetLetterSize(char);
-                    return sum + width + textBoxSpacingPx;
-                }, -textBoxSpacingPx);
-
-                const labelHeight = textBoxLetterHeight;
-                const padding = 4;
-                const totalWidth = labelWidth + padding * 2;
-                const totalHeight = labelHeight + padding * 2;
-
-                const x = Math.floor(canvas.width - totalWidth - 2);
-                const y = Math.floor(canvas.height - totalHeight - 2);
-
-                ctx.save();
-                ctx.rect(x, y, totalWidth, totalHeight);
-                ctx.strokeStyle = "#ffffff";
-                ctx.lineWidth = 1;
-                ctx.strokeRect(x - 0.5, y - 0.5, totalWidth, totalHeight);
-                ctx.restore();
-
-                ctx.save();
-                ctx.setLineDash([1, 2]);
-                ctx.strokeStyle = "#ffffff";
-                ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.moveTo(3, canvas.height - 19.5);
-                ctx.lineTo(canvas.width - totalWidth - 5, canvas.height - 19.5);
-                ctx.stroke();
-                ctx.restore();
-
-                let drawX = x + padding;
-                const drawY = y + padding;
-
-                for (let i = 0; i < label.length; i++) {
-                    const char = label[i];
-                    textBoxDrawLetter(char, drawX, drawY);
-                    const { width } = textBoxGetLetterSize(char);
-                    drawX += width + textBoxSpacingPx;
-                }
-            }
-
-            const letterPaths = {
-                "▤": "M80,80v80h80v-80ZM240,400v160h80v-160ZM80,240v-80h-80v80ZM80,240v80h160v-80ZM160,0v80h80v-80ZM320,80v80h160v-80ZM240,160v80h80v-80ZM320,320v80h80v-80ZM400,240v80h80v-80ZM480,160v80h80v-80ZM240,640v80h80v-80Z",
-                "■": "M0,0v160h80v-80h80v-80ZM240,80v80h-80v80h-80v80h160v-80h80v-160Z",
-                "•": "M80,0v80h-80v160h80v80h160v-80h80v-160h-80v-80Z",
-                "@": "M0,640v80h320v-80ZM0,0v80h320v-80ZM240,320v-160h-240v80h320v320h-240v-160h-80v80h240v-80h-160v-80Z",
-                "/": "M0,480v240h80v-240ZM80,240v240h80v-240ZM160,0v240h80v-240Z",
-                "□": "M80,320v-160h-80v160ZM80,320v80h240v-80ZM320,0v80h80v-80ZM80,80v80h240v-80Z",
-                "▢": "M320,160h-80v-80h80ZM320,160v80h80v80h240v-80h80v-160h-240v-80h160v240h-240v-160h80v80ZM240,400v80h-160v-480h160v80h-240v400h80v80h160v-80h80v-80ZM160,240v80h80v-80Z",
-                "▣": "M0,400v80h80v-80ZM80,480v80h160v-80ZM1120,400v80h80v-80ZM880,480v-80h-160v80ZM880,480v80h240v-80ZM720,400v-320h-80v320ZM640,80v-80h-160v80ZM400,80v320h80v-320ZM240,400v80h160v-80Z",
-                "-": "M0,0v80h320v-80Z",
-                ".": "M0,0v80h80v-80Z",
-                "→": "M240,80L240,0L160,0L160,80L240,80ZM320,160L320,80L240,80L240,160L320,160ZM320,400L400,400L400,320L480,320L480,240L400,240L400,160L320,160L320,240L0,240L0,320L320,320L320,400ZM240,480L160,480L160,560L240,560L240,480ZM320,400L240,400L240,480L320,480L320,400Z",
-                "←": "M240,80L240,0L320,0L320,80L240,80ZM160,160L160,80L240,80L240,160L160,160ZM160,400L80,400L80,320L0,320L0,240L80,240L80,160L160,160L160,240L480,240L480,320L160,320L160,400ZM240,480L320,480L320,560L240,560L240,480ZM160,400L240,400L240,480L160,480L160,400Z",
-                // Uppercase letters
-                A: "M80,0v80h160V0H80ZM80,720H0V80h80v320h160V80h80v640h-80v-240H80v240Z",
-                B: "M240,320v320h80v-320h-80ZM240,80v160h80V80h-80ZM240,720H0V0h240v80H80v160h160v80H80v320h160v80Z",
-                C: "M240,80v160h80V80h-80ZM80,0v80h160V0H80ZM240,480v160h80v-160h-80ZM80,640v80h160v-80H80ZM80,640V80H0v560h80Z",
-                D: "M240,80v560h80V80h-80ZM0,0h240v80H80v560h160v80H0V0Z",
-                E: "M0,0h320v160h-80v-80H80v240h80v-80h80v240h-80v-80H80v240h160v-80h80v160H0V0Z",
-                F: "M0,0h320v160h-80v-80H80v240h80v-80h80v240h-80v-80H80v240h80v80H0V0Z",
-                G: "M320,640H80v80h160v-320h-80v-80h160v320ZM240,80v80h80v-80h-80ZM240,80V0H80v80h160ZM0,80v560h80V80H0Z",
-                H: "M80,0v320h160V0h80v720h-80V400H80v320H0V0h80Z",
-                I: "M0,0h320v80h-80v560h80v80H0v-80h160V80H0V0Z",
-                J: "M80,640v80h160v-80H80ZM80,640v-80H0v80h80ZM320,640h-80V80h-80V0h160v640Z",
-                K: "M240,0v240h80V0h-80ZM160,400h-80v320H0V0h80v320h160v-80h-80v160ZM240,480v240h80v-240h-80ZM240,480v-80h-80v80h80Z",
-                L: "M80,0v640h160v-160h80v240H0V0h80Z",
-                M: "M0,0h160v720h80V80H80v640H0V0ZM240,0v80h80V0h-80Z",
-                N: "M160,480v-160h80V0h80v720h-80v-240h-80ZM80,720H0V0h80v160h80v160h-80v400Z",
-                O: "M80,640v80h160v-80H80ZM240,80v560h80V80h-80ZM80,0v80h160V0H80ZM0,80v560h80V80H0Z",
-                P: "M240,80v240h80V80h-80ZM0,0h240v80H80v240h160v80H80v320H0V0Z",
-                Q: "M240,80v480h80V80h-80ZM240,80V0H80v80h160ZM0,80v480h80V80H0ZM240,640v80h80v-80h-80ZM240,640v-80H80v80h160Z",
-                R: "M240,80v240h80V80h-80ZM240,400v320h80v-320h-80ZM240,400H80v320H0V0h240v80H80v240h160v80Z",
-                S: "M240,80v160h80V80h-80ZM240,80H80v240h80v-80H0V80h80V0h160v80ZM240,400v240h80v-240h-80ZM240,400v-80h-80v80h80ZM80,640v80h160v-80H80ZM0,480v160h80v-160H0Z",
-                T: "M80,160H0V0h320v80h-80v640h-80V80h-80v80Z",
-                U: "M80,640v80h160v-80H80ZM0,0v640h80V0H0ZM240,0v640h80V0h-80Z",
-                V: "M160,560v160h80v-160h-80ZM240,0v560h80V0h-80ZM80,480v80h80v-80h-80ZM0,0v480h80V0H0Z",
-                W: "M240,640v-640h-80v640ZM240,640v80h80v-80ZM80,640v-640h-80v640ZM80,640v80h80v-80Z",
-                X: "M240,0v320h80v-320ZM0,400v320h80v-320ZM80,320h-80v-320h80v240h80v80h80v80h80v320h-80v-240h-80v-80h-80Z",
-                Y: "M80,320v-320h-80v320ZM80,320v80h80v-80ZM240,0v400h80v-400ZM160,640v-240h80v240h80v80h-240v-80Z",
-                Z: "M0,480h80v160h160v-80h80v160h-320ZM80,320v160h80v-160h80v-240h-160v80h-80v-160h320v160h-160v160Z",
-
-                // Lowercase letters
-                a: "M240,240v-160h80v480h-240v-80h160v-160h-160v-80ZM0,320v160h80v-160ZM80,0v80h-80v80h80v-80h160v-80Z",
-                b: "M80,640h-80v-640h80v160h160v80h-160ZM80,640v80h160v-80h80v-400h-80v400Z",
-                c: "M240,400v80h80v-80ZM80,0v80h160v-80ZM240,80v80h80v-80ZM0,80v400h80v-400ZM80,480v80h160v-80Z",
-                d: "M0,240v400h80v-400ZM80,640v80h160v-80ZM320,640h-80v-400h-160v-80h160v-160h80Z",
-                e: "M80,320v160h-80v-400h80v160h160v-160h80v240ZM80,0v80h160v-80ZM240,400v80h-160v80h160v-80h80v-80Z",
-                f: "M160,0v80h160v-80ZM0,160h80v-80h80v80h160v80h-160v400h80v80h-240v-80h80v-400h-80Z",
-                g: "M0,80v240h80v-240ZM80,400v-80h240v-240h-80v320h-80v80h160v80h-240v-80h-80v-80ZM240,80v-80h-160v80Z",
-                h: "M160,240v80h80v-80ZM80,0v320h80v80h-80v400h-80v-800ZM240,320v480h80v-480Z",
-                i: "M0,640h160v80h-160ZM160,0v80h80v-80ZM160,640v-320h-160v-80h160v-80h80v480ZM240,720v-80h80v80Z",
-                j: "M80,720v-80h-80v80ZM80,720v80h160v-80ZM320,720h-80v-400h-80v-80h80v-80h80ZM240,0v80h80v-80Z",
-                k: "M240,640v-80h-80v80ZM240,640v160h80v-160ZM240,160v160h80v-160ZM80,0v480h160v-160h-80v240h-80v240h-80v-800Z",
-                l: "M0,0h160v560h160v80h-320v-80h80v-480h-80Z",
-                m: "M80,0v80h80v-80ZM0,80v480h80v-480ZM240,0v80h80v-80ZM160,80v480h80v-480Z",
-                n: "M0,80v480h80v-480ZM240,80v-80h-160v80ZM240,80v480h80v-480Z",
-                o: "M0,80v400h80v-400ZM80,480v80h160v-80ZM240,80v-80h-160v80ZM240,80v400h80v-400Z",
-                p: "M240,80h-160v-80h160ZM240,80v400h-160v80h-80v-480h80v320h240v-320Z",
-                q: "M0,80v320h80v-320ZM80,0v80h160v-80ZM240,400v-320h80v480h-80v-80h-160v-80Z",
-                r: "M80,480v-400h-80v-80h160v80h80v80h-80v320h80v80h-240v-80ZM240,0v80h80v-80Z",
-                s: "M80,480v-160h-80v160ZM80,480v80h160v-80ZM240,320v-80h-80v80ZM240,320v160h80v-160ZM80,80v-80h160v160h80v-80ZM80,80v160h80v-80h-160v-80Z",
-                t: "M80,640v-400h-80v-80h80v-160h80v160h80v80h-80v400ZM160,720v-80h80v80ZM240,640v-80h80v80Z",
-                u: "M80,560v-80h160v-480h80v560ZM0,0v480h80v-480Z",
-                v: "M240,0v480h80v-480ZM160,480v-80h-80v80ZM160,480v80h80v-80ZM0,0v400h80v-400Z",
-                w: "M0,0v480h80v-480ZM160,0v480h80v-480ZM80,480v80h80v-80ZM240,480v80h80v-80Z",
-                x: "M240,320v-80h-160v80ZM240,320v240h80v-240ZM0,320v240h80v-240ZM80,240v-240h-80v240ZM240,0v240h80v-240Z",
-                y: "M240,0v320h80v-320ZM80,480v-80h-80v80ZM80,480v80h80v-80ZM80,240v-240h-80v240ZM80,240v80h80v-80ZM160,320v160h80v-160Z",
-                z: "M0,320h80v160h160v-80h80v160h-320ZM80,160h-80v-160h320v160h-80v-80h-160ZM80,240v80h80v-80h80v-80h-80v80Z",
-
-                // Numbers
-                0: "M80,640h-80v-560h80v240h80v80h-80ZM80,640v80h160v-400h-80v-80h80v-160h80v560ZM80,0v80h160v-80Z",
-                1: "M0,640v80h160v-80ZM240,640h-80v-560h-160v-80h240ZM240,640v80h80v-80Z",
-                2: "M160,320v80h80v-80ZM240,80v-80h-160v80ZM240,80v240h80v-240ZM0,80v80h80v-80ZM80,400v160h80v-160ZM0,560h80v80h240v80h-320Z",
-                3: "M240,320v-80h-80v80ZM240,320v320h80v-320ZM0,560v80h80v-80ZM240,80v-80h-160v80ZM240,80v160h80v-160ZM80,320v80h80v-80ZM80,640v80h160v-80ZM0,80v80h80v-80Z",
-                4: "M240,480h-240v-160h80v80h160v-240h-80v-80h80v-80h80v720h-80ZM80,160v160h80v-160Z",
-                5: "M0,560v80h80v-80ZM240,320h-240v-320h320v80h-240v160h160ZM240,320v320h80v-320ZM80,640v80h160v-80Z",
-                6: "M160,0v80h160v-80ZM80,640h-80v-480h160v-80h-80v160h160v400h80v-320h-240ZM80,640v80h160v-80Z",
-                7: "M80,480v240h80v-240ZM160,240v240h80v-240ZM240,240v-160h-240v-80h320v240Z",
-                8: "M0,80v240h80v-240ZM80,0v80h160v-80ZM240,80v240h80v-240ZM80,320v80h160v-80ZM240,400v240h80v-240ZM80,640v-240h-80v240ZM80,640v80h160v-80Z",
-                9: "M0,80v240h80v-240ZM80,0v80h160v-80ZM240,320v-240h80v560h-240v80h160v-320h-160v-80Z",
-            };
-
-            const letterHeights = {
-                "▤": 720,
-                "↕": 80,
-                "■": 320,
-                "•": 320, // Bullet height
-                "@": 720, // @ symbol height
-                "/": 720, // Slash height
-                "□": 400, // White square height
-                "▢": 560, // Alternative white square height
-                "▣": 560, // White square with vertical line height
-                "-": 80, // Hyphen height (very short)
-                ".": 80,
-                "→": 560,
-                "←": 560,
-
-                // Uppercase letters - all 720
-                A: 720,
-                B: 720,
-                C: 720,
-                D: 720,
-                E: 720,
-                F: 720,
-                G: 720,
-                H: 720,
-                I: 720,
-                J: 720,
-                K: 720,
-                L: 720,
-                M: 720,
-                N: 720,
-                O: 720,
-                P: 720,
-                Q: 720,
-                R: 720,
-                S: 720,
-                T: 720,
-                U: 720,
-                V: 720,
-                W: 720,
-                X: 720,
-                Y: 720,
-                Z: 720,
-
-                // Lowercase letters - varying heights
-                a: 560,
-                b: 720,
-                c: 560,
-                d: 720,
-                e: 560,
-                f: 720,
-                g: 560,
-                h: 800,
-                i: 720,
-                j: 800,
-                k: 800,
-                l: 640,
-                m: 560,
-                n: 560,
-                o: 560,
-                p: 560,
-                q: 560,
-                r: 560,
-                s: 560,
-                t: 720,
-                u: 560,
-                v: 560,
-                w: 560,
-                x: 560,
-                y: 560,
-                z: 560,
-
-                // Numbers
-
-                0: 720,
-                1: 720,
-                2: 720,
-                3: 720,
-                4: 720,
-                5: 720,
-                6: 720,
-                7: 720,
-                8: 720,
-                9: 720,
-
-                default: 720,
-                space: 720,
-            };
-
-            const letterWidths = {
-                "▤": 560, // This character is wider
-                "↕": 320,
-                "■": 320,
-                "•": 320, // Bullet width
-                "@": 320, // @ symbol width
-                "/": 240, // Slash width (narrower)
-                "□": 400, // White square width (wider)
-                "▢": 720, // Alt white square width (much wider)
-                "▣": 1200, // White square with vertical line (very wide)
-                "-": 320, // Hyphen width
-                ".": 320,
-                "→": 480,
-                "←": 480,
-                " ": 160,
-                default: 320,
-            };
-
-            function textBoxNext(event) {
-                if (event.currentTarget.getAttribute("state") === "fast")
-                    textBoxCharDelay = 0;
-                else console.log("next");
-            }
-
-            (function makeTextBoxDraggable() {
-                const container = document.getElementById("textbox_container");
-                const moveTargets = document.querySelectorAll(".move_textbox");
-
-                const viewportPadding = 8; // px from edges
-                let isDragging = false;
-                let offsetX = 0;
-                let offsetY = 0;
-
-                function onPointerDown(e) {
-                    if (e.button !== 0) return;
-                    const target = e.target;
-
-                    // Must be dragging from a move_textbox AND container must be active
-                    if (
-                        ![...moveTargets].includes(target) ||
-                        container.getAttribute("active") !== "1"
-                    )
-                        return;
-
-                    isDragging = true;
-
-                    const rect = container.getBoundingClientRect();
-                    offsetX = e.clientX - rect.left;
-                    offsetY = e.clientY - rect.top;
-
-                    document.addEventListener("pointermove", onPointerMove);
-                    document.addEventListener("pointerup", onPointerUp);
-                }
-
-                function onPointerMove(e) {
-                    if (!isDragging) return;
-
-                    const viewportWidth = window.innerWidth;
-                    const viewportHeight = window.innerHeight;
-
-                    let newLeft = e.clientX - offsetX;
-                    let newTop = e.clientY - offsetY;
-
-                    // Clamp to viewport with padding
-                    const containerRect = container.getBoundingClientRect();
-                    const containerWidth = containerRect.width;
-                    const containerHeight = containerRect.height;
-
-                    newLeft = Math.max(
-                        viewportPadding,
-                        Math.min(
-                            newLeft,
-                            viewportWidth - containerWidth - viewportPadding,
-                        ),
-                    );
-                    newTop = Math.max(
-                        viewportPadding,
-                        Math.min(
-                            newTop,
-                            viewportHeight - containerHeight - viewportPadding,
-                        ),
-                    );
-
-                    container.style.left = `${newLeft}px`;
-                    container.style.top = `${newTop}px`;
-                }
-
-                function onPointerUp() {
-                    isDragging = false;
-                    document.removeEventListener("pointermove", onPointerMove);
-                    document.removeEventListener("pointerup", onPointerUp);
-                }
-
-                // Attach pointerdown to all move handles
-                moveTargets.forEach((el) => {
-                    el.style.cursor = "grab";
-                    el.addEventListener("pointerdown", onPointerDown);
-                });
-
-                // Optional: start with absolute positioning
-                container.style.position = "absolute";
-                if (!container.style.left)
-                    container.style.left = `${viewportPadding}px`;
-                if (!container.style.top)
-                    container.style.top = `${window.innerHeight - viewportPadding - container.getBoundingClientRect().height}px`;
-            })();
-
-            textBoxDrawText(
-                "Hello World. We are ▤Scene. Welcome to the Pixel RPG Demo. This is going to be quite the ride. This is a demo. It is a work in progress. It is not perfect but it is a start. It is not polished but it is a start.",
-            );
-            textBoxNextButton.addEventListener("click", textBoxNext, false);
+            // Initialize
+            generateSVG();
         </script>
     </body>
 </html>

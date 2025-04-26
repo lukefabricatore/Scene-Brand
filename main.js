@@ -308,6 +308,23 @@ function setupAnalogie() {
     });
   }
 }
+function setupDynamics() {
+  let panel = document.querySelector(".panel#dynamics");
+  panel.querySelector(".open_content").setAttribute("needs_corners", "true");
+  setupCustomSlider(
+    document.querySelector("#dynamics .custom_slider"),
+    function (value) {
+      document.querySelector("#dynamics h1").style.fontVariationSettings =
+        `'wght' ${value}`;
+      const svgButton = document.querySelector("#dynamics #runes_svg_button");
+      svgButton.setAttribute(
+        "download_button",
+        `assets/downloads/dynamics/${value}.svg`,
+      );
+      svgButton.setAttribute("download_name", `scene_${value}.svg`);
+    },
+  );
+}
 
 // TAB BUTTONS
 
