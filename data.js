@@ -57,7 +57,7 @@ const gridItems = [
     },
     open: {
       desk: [650, 345],
-      mob: [650, 345],
+      mob: [420, 280],
     },
     content: {
       html: `
@@ -76,7 +76,7 @@ const gridItems = [
     },
     open: {
       desk: [650, 410],
-      mob: [650, 350],
+      mob: [420, 350],
     },
     content: {
       background: "#2B3400",
@@ -185,7 +185,7 @@ const gridItems = [
     },
     open: {
       desk: [650, 370],
-      mob: [650, 370],
+      mob: [500, 310],
     },
     content: {
       background: "#1F1F1F",
@@ -214,7 +214,7 @@ const gridItems = [
       html: `
       <div id="main_video_container">
         <div class="video_inner">
-          <video autoplay loop muted id="main_video" src="assets/thumbnails/brandvideo.mp4" poster="https://example.com/poster.jpg"></video>
+          <video playsinline autoplay loop muted id="main_video" src="assets/thumbnails/brandvideo.mp4" poster="https://example.com/poster.jpg"></video>
         </div>
       </div>
       `,
@@ -292,16 +292,18 @@ const openPanelData = {
     html: `
       <p class="caption">START TYPING BELOW</p>
       <textarea placeholder="Hello World. This is Instrument"></textarea>
-      <button class='inline_button tab_button'>
-        <p>SHIFT</p>
-        <div class="button_tabs">
-          <div class="tab active" tab="serif"><div class="sceneserif"></div>
-          </div><div class="tab" tab="sans"><div class="scenesans"></div></div>
-        </div>
-      </button><button class='inline_button emphasis'>
-        <p>GET FONT</p>
-        <a href="https://fonts.google.com/?query=instrument" target="_blank"></a>
-      </button>
+      <span class="inline_button_container">
+        <button class='inline_button tab_button'>
+          <p>SHIFT</p>
+          <div class="button_tabs">
+            <div class="tab active" tab="serif"><div class="sceneserif"></div>
+            </div><div class="tab" tab="sans"><div class="scenesans"></div></div>
+          </div>
+        </button><button class='inline_button emphasis'>
+          <p>GET FONT</p>
+          <a href="https://fonts.google.com/?query=instrument" target="_blank"></a>
+        </button>
+      </span>
     `,
     action: function () {
       setupInstrument();
@@ -375,15 +377,16 @@ const openPanelData = {
           </div>
           <button class="inline_button slider_button" type="add"><div class="sceneadd"></div></button>
       </div>
-      <button download_button='assets/downloads/dynamics/100.svg' download_name='scene_100.svg' class='inline_button emphasis white' id='runes_svg_button'>
-        <p>GET SVG</p>
-      </button><button class='inline_button'>
-        <p>GET PNG</p>
-      </button>
-      <button class='inline_button'>
-        <p>GET TTF</p>
-        <a href="assets/global/scene_runes.ttf" download></a>
-      </button>
+      <span class="inline_button_container">
+        <button download_button='assets/downloads/dynamics/100.svg' download_name='scene_100.svg' class='inline_button emphasis white' id='runes_svg_button'>
+          <p>GET SVG</p>
+        </button><button class='inline_button'>
+          <p>GET PNG</p>
+        </button><button class='inline_button'>
+          <p>GET TTF</p>
+          <a href="assets/global/scene_runes.ttf" download></a>
+        </button>
+      </span>
     `,
     action: function () {
       setupDynamics();
@@ -496,8 +499,10 @@ const openPanelData = {
       <p class="caption">CONGRATS! YOU'RE A...</p>
       <h1 type="past">Rotary</h1>
       <h1 type="future">Terraformer</h1>
-      <button class='inline_button'><p>GET PNG</p></button>
-      <button class='inline_button emphasis'><p>NEW TITLE</p></button>
+      <span class="inline_button_container">
+        <button class='inline_button'><p>GET PNG</p>
+        </button><button class='inline_button emphasis'><p>NEW TITLE</p></button>
+      </span>
     `,
     action: function () {
       setupJobs();

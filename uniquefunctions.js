@@ -44,19 +44,24 @@ function setupCustomSlider(
     linkedFunction(value);
   }
 
-  handleZone.addEventListener("pointerdown", (e) => {
-    isDragging = true;
-    updateSlider(e);
-    window.addEventListener("pointermove", updateSlider);
-    window.addEventListener(
-      "pointerup",
-      () => {
-        isDragging = false;
-        window.removeEventListener("pointermove", updateSlider);
-      },
-      { once: true },
-    );
-  });
+  handleZone.addEventListener(
+    "pointerdown",
+    (e) => {
+      e.preventDefault();
+      isDragging = true;
+      updateSlider(e);
+      window.addEventListener("pointermove", updateSlider);
+      window.addEventListener(
+        "pointerup",
+        () => {
+          isDragging = false;
+          window.removeEventListener("pointermove", updateSlider);
+        },
+        { once: true },
+      );
+    },
+    { passive: false },
+  );
   addButton.addEventListener("click", () => {
     const currentValue = parseInt(fill.querySelector("p").textContent);
     const newValue = Math.min(currentValue + 1, snapPoints[2]);

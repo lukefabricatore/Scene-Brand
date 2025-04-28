@@ -44,6 +44,9 @@ span.hide {
     -ms-user-select: none;
     user-select: none;
 }
+video:fullscreen {
+    object-fit: contain !important;
+}
 @media (max-width: 850px) {
     * {
         --radius: 24px;
@@ -325,9 +328,7 @@ p {
     left: 0;
     height: 100%;
     width: 100%;
-    overflow-y: scroll;
     box-sizing: border-box;
-    overflow-x: hidden;
 }
 @media only screen and (max-width: 850px) {
     .panel .exit_btn {
@@ -431,7 +432,7 @@ p {
 
 button.inline_button {
     all: unset;
-    padding: 10px 20px;
+    padding: 10px 16px;
     border-radius: 19px;
     border: 2px solid var(--gray);
     cursor: pointer;
@@ -440,6 +441,10 @@ button.inline_button {
     height: 50px;
     position: relative;
     transition: transform 0.2s cubic-bezier(0.17, 0.67, 0.29, 2.71);
+}
+.inline_button_container {
+    display: block;
+    white-space: nowrap;
 }
 button.inline_button p {
     color: white;
@@ -701,6 +706,7 @@ button.inline_button .tab svg path {
     height: 100%;
     width: 100%;
     cursor: pointer;
+    touch-action: none;
 }
 .inline_button.slider_button {
     margin: 0;
@@ -1031,6 +1037,13 @@ input[type="number"] {
     color: var(--energyburst);
     font-family: "Instrument Serif";
     float: left;
+    vertical-align: super;
+}
+@supports (hanging-punctuation: first) and (font: -apple-system-body) and
+    (-webkit-appearance: none) {
+    .panel[id="jobs"] .thumb_content h1 span.icon::before {
+        vertical-align: unset;
+    }
 }
 .panel[id="jobs"] .thumb_content h1.past span.icon::before {
     content: "←";
@@ -1327,11 +1340,14 @@ input[type="number"] {
 /* INSTRUMENT PANEL */
 .panel#instrument .open_content .main_content_scroll {
     padding: 36px;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 .panel#instrument .open_content p.caption {
     color: white;
 }
 textarea {
+    padding: 0;
     font-size: 74px;
     color: white;
     background: none;
@@ -1340,7 +1356,7 @@ textarea {
     outline: none;
     width: 100%;
     line-height: 1;
-    margin: 20px 0 30px -5px;
+    margin: 20px 0 30px 0;
     height: 160px;
 }
 .panel.open textarea {
@@ -1368,6 +1384,8 @@ textarea {
 /* ANALOGIE PANEL */
 .panel#analogie .open_content .main_content_scroll {
     padding: 36px;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 .panel[id="analogie"] .open_content p.caption {
     color: white;
@@ -1390,6 +1408,8 @@ textarea {
 
 .panel#dynamics .open_content .main_content_scroll {
     padding: 36px;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 .panel#dynamics h1 {
     all: unset;
@@ -1584,10 +1604,12 @@ textarea {
     }
 }
 
-/* JOB TITLE PANEL */
+/* JOBS PANEL */
 
 .panel#jobs .open_content .main_content_scroll {
     padding: 36px;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 .panel#jobs .open_content h1 {
     color: white;
@@ -1611,6 +1633,9 @@ textarea {
 @media only screen and (max-width: 1150px) {
     .panel#jobs .open_content .main_content_scroll {
         padding: 28px 24px;
+    }
+    .panel#jobs .open_content h1 {
+        font-size: 70px;
     }
 }
 
