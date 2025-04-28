@@ -5,28 +5,36 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Interactive Vertical Textbox</title>
         <style>
-            body {
-                font-family: sans-serif;
-                padding: 20px;
-            }
-            .canvas-wrapper {
+            .vt_canvas_wrapper {
                 position: relative;
                 display: inline-block;
-                margin-top: 20px;
             }
-            svg {
+            .vt_canvas_wrapper svg {
                 border: 1px solid #ccc;
                 display: block;
                 cursor: text;
             }
-            #clickableContainer {
+            #vt_clickable_container {
                 position: absolute;
                 top: 0;
                 left: 0;
                 pointer-events: none;
             }
-            #clickableContainer div {
+            #vt_clickable_container div {
                 cursor: text;
+            }
+            #vt_hidden_input {
+                position: absolute;
+                opacity: 0;
+                pointer-events: none;
+                height: 1px;
+                width: 1px;
+            }
+            .vt_buttons {
+                margin-top: 10px;
+            }
+            .vt_buttons button {
+                margin-right: 5px;
             }
             @keyframes blink {
                 0% {
@@ -43,11 +51,12 @@
                 animation: blink 1s 0.3s step-start infinite;
                 fill: #ff9d00;
             }
-            .highlight {
-                fill: rgba(100, 100, 255, 0.5);
-            }
             .highlight-all {
                 fill: rgba(150, 150, 255, 0.3);
+            }
+            .placeholder {
+                fill: gray;
+                opacity: 0.5;
             }
         </style>
     </head>
@@ -55,44 +64,129 @@
         <h1>Interactive Vertical Textbox</h1>
 
         <label>Spacing (in pixels):</label>
-        <input id="spacingInput" type="number" value="1" />
+        <input id="vt_spacing_input" type="number" value="1" />
 
         <label>Scale (integer, 1 = 0.01, 10 = 0.1, 20 = 0.2, etc):</label>
-        <input id="scaleInput" type="number" value="5" />
+        <input id="vt_scale_input" type="number" value="5" />
 
-        <div class="buttons">
+        <div class="vt_buttons">
             <button onclick="insertSpecialChar('■')">■</button>
             <button onclick="insertSpecialChar('▤')">▤</button>
             <button onclick="insertSpecialChar('▢')">▢</button>
+            <button onclick="downloadVertText()">Download SVG</button>
+            <button onclick="clearAll()">Clear All</button>
         </div>
 
-        <div class="canvas-wrapper">
+        <input id="vt_hidden_input" type="text" />
+
+        <div class="vt_canvas_wrapper" onclick="vtFocusHiddenInput()">
             <div id="svgContainer"></div>
-            <div id="clickableContainer"></div>
+            <div id="vt_clickable_container"></div>
         </div>
 
         <script src="data.js"></script>
-
         <script>
-            const defaultLetterHeight = 720;
-            const defaultLetterWidth = 320;
-            const pixelSize = 80;
+            const placeholderText = [
+                "T",
+                "y",
+                "p",
+                "e",
+                " ",
+                "H",
+                "e",
+                "r",
+                "e",
+            ];
             let text = "";
             let cursorIndex = 0;
             let selectionStart = null;
             let selectionEnd = null;
 
+            const isTouchDevice =
+                "ontouchstart" in window || navigator.maxTouchPoints > 0;
+
+            function vtFocusHiddenInput() {
+                if (isTouchDevice) {
+                    const input = document.getElementById("vt_hidden_input");
+                    input.focus();
+                }
+            }
+
+            // STARTUP
+            if (isTouchDevice) {
+                document
+                    .getElementById("vt_hidden_input")
+                    .addEventListener("input", (e) => {
+                        const value = e.target.value;
+                        if (value.length > 0) {
+                            vtAddCharacterAtCursor(value);
+                            e.target.value = "";
+                        }
+                    });
+            }
+
             function isMetaKeyPressed(e) {
                 return e.ctrlKey || e.metaKey;
             }
 
-            function generateSVG() {
+            function vtAddCharacterAtCursor(chars) {
+                if (!chars) return;
+                if (selectionStart !== null && selectionEnd !== null) {
+                    const min = Math.min(selectionStart, selectionEnd);
+                    const max = Math.max(selectionStart, selectionEnd);
+                    text = text.slice(0, min) + chars + text.slice(max);
+                    cursorIndex = min + chars.length;
+                    selectionStart = selectionEnd = null;
+                } else {
+                    text =
+                        text.slice(0, cursorIndex) +
+                        chars +
+                        text.slice(cursorIndex);
+                    cursorIndex += chars.length;
+                }
+                if (text.length > 50) text = text.slice(0, 50);
+                generateVertText();
+            }
+
+            function insertSpecialChar(char) {
+                vtAddCharacterAtCursor(char);
+            }
+
+            function downloadVertText() {
+                const svgElement = document
+                    .getElementById("svgTextbox")
+                    .cloneNode(true);
+                svgElement
+                    .querySelectorAll(".cursor")
+                    .forEach((cursor) => cursor.remove());
+
+                const serializer = new XMLSerializer();
+                const source = serializer.serializeToString(svgElement);
+                const blob = new Blob([source], {
+                    type: "image/svg+xml;charset=utf-8",
+                });
+                const url = URL.createObjectURL(blob);
+
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "vertical-text.svg";
+                a.click();
+
+                URL.revokeObjectURL(url);
+            }
+
+            function generateVertText() {
                 const spacing =
-                    parseInt(document.getElementById("spacingInput").value) ||
-                    0;
+                    parseInt(
+                        document.getElementById("vt_spacing_input").value,
+                    ) || 0;
                 const scaleInputValue =
-                    parseInt(document.getElementById("scaleInput").value) || 10;
+                    parseInt(document.getElementById("vt_scale_input").value) ||
+                    10;
                 const scale = scaleInputValue * 0.01;
+
+                const displayText =
+                    text.length > 0 ? text.split("") : placeholderText;
 
                 let yOffset = 0;
                 let svgContent = "";
@@ -100,82 +194,73 @@
                 let maxWidth = 0;
                 const elements = [];
 
-                const chars = text.length > 0 ? text.split("") : ["_"];
-
-                for (let i = 0; i < chars.length; i++) {
-                    const char = chars[i];
-                    const nextChar = chars[i + 1];
-                    const isLastChar = i === chars.length - 1;
+                for (let i = 0; i < displayText.length; i++) {
+                    const char = displayText[i];
+                    const nextChar = displayText[i + 1];
+                    const isLastChar = i === displayText.length - 1;
 
                     if (!letterPaths[char] && char !== " ") continue;
 
                     const pathData = letterPaths[char] || "";
                     const letterHeight =
-                        letterHeights[char] ||
-                        letterHeights.space ||
-                        defaultLetterHeight;
-                    const letterWidth =
-                        letterWidths[char] || defaultLetterWidth;
+                        letterHeights[char] || letterHeights.space || 720;
+                    const letterWidth = letterWidths[char] || 320;
 
                     elements.push({
                         pathData,
                         yOffset,
                         letterWidth,
                         letterHeight,
+                        isPlaceholder: text.length === 0,
                     });
                     if (letterWidth > maxWidth) maxWidth = letterWidth;
 
                     yOffset += letterHeight;
                     if (!isLastChar) {
                         if (!(char === "■" && nextChar === "■")) {
-                            yOffset += spacing * pixelSize;
+                            yOffset += spacing * 80;
                         }
                     }
                 }
 
                 const totalHeight = yOffset || 720;
 
-                if (selectionStart === 0 && selectionEnd === text.length) {
-                    highlightContent += `<rect class="highlight-all" x="0" y="0" width="${maxWidth}" height="${totalHeight}" />\n`;
-                } else {
-                    for (let i = 0; i < elements.length; i++) {
-                        const { yOffset, letterHeight } = elements[i];
-                        if (
-                            selectionStart !== null &&
-                            selectionEnd !== null &&
-                            i >= Math.min(selectionStart, selectionEnd) &&
-                            i < Math.max(selectionStart, selectionEnd)
-                        ) {
-                            highlightContent += `<rect class="highlight" x="0" y="${yOffset}" width="${maxWidth}" height="${letterHeight}" />\n`;
-                        }
-                    }
+                if (
+                    selectionStart === 0 &&
+                    selectionEnd === text.length &&
+                    text.length > 0
+                ) {
+                    highlightContent = `<rect class="highlight-all" x="0" y="0" width="${maxWidth}" height="${totalHeight}" />\n`;
                 }
 
                 for (let i = 0; i < elements.length; i++) {
-                    const { pathData, yOffset, letterWidth } = elements[i];
+                    const { pathData, yOffset, letterWidth, isPlaceholder } =
+                        elements[i];
                     const xOffset = (maxWidth - letterWidth) / 2;
                     if (pathData) {
-                        svgContent += `<path d="${pathData}" transform="translate(${xOffset},${yOffset})" />\n`;
+                        svgContent += `<path d="${pathData}" class="${isPlaceholder ? "placeholder" : ""}" transform="translate(${xOffset},${yOffset})" />\n`;
                     }
                 }
 
                 let cursorYOffset = 0;
-                for (let i = 0; i < cursorIndex; i++) {
-                    const char = text[i];
-                    const nextChar = text[i + 1];
-                    const letterHeight =
-                        letterHeights[char] ||
-                        letterHeights.space ||
-                        defaultLetterHeight;
-                    cursorYOffset += letterHeight;
-                    if (!(char === "■" && nextChar === "■")) {
-                        cursorYOffset += spacing * pixelSize;
+                if (text.length > 0) {
+                    for (let i = 0; i < cursorIndex; i++) {
+                        const char = text[i];
+                        const nextChar = text[i + 1];
+                        const letterHeight =
+                            letterHeights[char] || letterHeights.space || 720;
+                        cursorYOffset += letterHeight;
+                        if (!(char === "■" && nextChar === "■")) {
+                            cursorYOffset += spacing * 80;
+                        }
                     }
+                    cursorYOffset = Math.min(
+                        Math.max(0, cursorYOffset - 80),
+                        totalHeight - 80,
+                    );
+                } else {
+                    cursorYOffset = 0;
                 }
-                cursorYOffset = Math.min(
-                    Math.max(0, cursorYOffset - 80),
-                    totalHeight - 80,
-                );
 
                 const svg = `
     <svg id="svgTextbox" width="${maxWidth * scale}" height="${totalHeight * scale}" viewBox="0 0 ${maxWidth} ${totalHeight}" xmlns="http://www.w3.org/2000/svg">
@@ -190,157 +275,152 @@
                 document.getElementById("svgContainer").innerHTML = svg;
 
                 let clickableHTML = "";
-                for (let i = 0; i <= elements.length; i++) {
-                    let top = 0;
-                    let height = 0;
-                    if (i === 0) {
-                        top = 0;
-                        height = elements[0]
-                            ? elements[0].letterHeight / 2
-                            : 40;
-                    } else if (i === elements.length) {
-                        const prev = elements[i - 1];
-                        top = prev.yOffset + prev.letterHeight / 2;
-                        height = prev.letterHeight / 2;
-                    } else {
-                        const prev = elements[i - 1];
-                        const next = elements[i];
-                        top = prev.yOffset + prev.letterHeight / 2;
-                        height = next.yOffset + next.letterHeight / 2 - top;
+                if (text.length > 0) {
+                    for (let i = 0; i <= elements.length; i++) {
+                        let top = 0;
+                        let height = 0;
+                        if (i === 0) {
+                            top = 0;
+                            height = elements[0]
+                                ? elements[0].letterHeight / 2
+                                : 40;
+                        } else if (i === elements.length) {
+                            const prev = elements[i - 1];
+                            top = prev.yOffset + prev.letterHeight / 2;
+                            height = prev.letterHeight / 2;
+                        } else {
+                            const prev = elements[i - 1];
+                            const next = elements[i];
+                            top = prev.yOffset + prev.letterHeight / 2;
+                            height = next.yOffset + next.letterHeight / 2 - top;
+                        }
+                        clickableHTML += `<div style="position:absolute;left:0;top:${top * scale}px;width:${maxWidth * scale}px;height:${height * scale}px;pointer-events:all;" data-index="${i}"></div>`;
                     }
-                    clickableHTML += `<div style="position:absolute;left:0;top:${top * scale}px;width:${maxWidth * scale}px;height:${height * scale}px;pointer-events:all;" data-index="${i}"></div>`;
                 }
 
-                document.getElementById("clickableContainer").innerHTML =
-                    clickableHTML;
-                document.getElementById("clickableContainer").style.width =
-                    `${maxWidth * scale}px`;
-                document.getElementById("clickableContainer").style.height =
-                    `${totalHeight * scale}px`;
+                const clickableContainer = document.getElementById(
+                    "vt_clickable_container",
+                );
 
-                document
-                    .querySelectorAll("#clickableContainer div")
-                    .forEach((div) => {
-                        div.addEventListener("click", (e) => {
-                            cursorIndex = parseInt(
-                                e.target.getAttribute("data-index"),
-                            );
-                            selectionStart = null;
-                            selectionEnd = null;
-                            generateSVG();
-                        });
+                clickableContainer.innerHTML = clickableHTML;
+                clickableContainer.style.width = `${maxWidth * scale}px`;
+                clickableContainer.style.height = `${totalHeight * scale}px`;
+
+                clickableContainer.querySelectorAll("div").forEach((div) => {
+                    div.addEventListener("click", (e) => {
+                        cursorIndex = parseInt(
+                            e.target.getAttribute("data-index"),
+                        );
+                        selectionStart = null;
+                        selectionEnd = null;
+                        generateVertText();
                     });
+                });
             }
 
-            document
-                .getElementById("spacingInput")
-                .addEventListener("input", generateSVG);
-            document
-                .getElementById("scaleInput")
-                .addEventListener("input", generateSVG);
-
-            document.addEventListener("keydown", (e) => {
-                if (e.key.length === 1 && !isMetaKeyPressed(e)) {
-                    if (text.length >= 50) return;
-                    if (selectionStart !== null && selectionEnd !== null) {
-                        const min = Math.min(selectionStart, selectionEnd);
-                        const max = Math.max(selectionStart, selectionEnd);
-                        text = text.slice(0, min) + e.key + text.slice(max);
-                        cursorIndex = min + 1;
-                        selectionStart = selectionEnd = null;
-                    } else {
-                        text =
-                            text.slice(0, cursorIndex) +
-                            e.key +
-                            text.slice(cursorIndex);
-                        cursorIndex++;
-                    }
-                    generateSVG();
-                } else if (e.key === "Backspace") {
-                    if (selectionStart !== null && selectionEnd !== null) {
-                        const min = Math.min(selectionStart, selectionEnd);
-                        const max = Math.max(selectionStart, selectionEnd);
-                        text = text.slice(0, min) + text.slice(max);
-                        cursorIndex = min;
-                        selectionStart = selectionEnd = null;
-                    } else if (cursorIndex > 0) {
-                        text =
-                            text.slice(0, cursorIndex - 1) +
-                            text.slice(cursorIndex);
-                        cursorIndex--;
-                    }
-                    generateSVG();
-                } else if (e.key === "Delete") {
-                    if (cursorIndex < text.length) {
-                        text =
-                            text.slice(0, cursorIndex) +
-                            text.slice(cursorIndex + 1);
-                        generateSVG();
-                    }
-                } else if (e.key === "ArrowUp") {
-                    if (cursorIndex > 0) {
-                        cursorIndex--;
-                        generateSVG();
-                    }
-                } else if (e.key === "ArrowDown") {
-                    if (cursorIndex < text.length) {
-                        cursorIndex++;
-                        generateSVG();
-                    }
-                } else if (isMetaKeyPressed(e) && e.key.toLowerCase() === "a") {
-                    e.preventDefault();
-                    selectionStart = 0;
-                    selectionEnd = text.length;
-                    generateSVG();
-                } else if (isMetaKeyPressed(e) && e.key.toLowerCase() === "c") {
-                    if (selectionStart !== null && selectionEnd !== null) {
-                        const min = Math.min(selectionStart, selectionEnd);
-                        const max = Math.max(selectionStart, selectionEnd);
-                        navigator.clipboard.writeText(text.slice(min, max));
-                    }
-                } else if (isMetaKeyPressed(e) && e.key.toLowerCase() === "v") {
-                    navigator.clipboard.readText().then((clipText) => {
-                        if (text.length + clipText.length > 50)
-                            clipText = clipText.slice(0, 50 - text.length);
+            if (!isTouchDevice) {
+                document.addEventListener("keydown", (e) => {
+                    if (e.key.length === 1 && !isMetaKeyPressed(e)) {
+                        vtAddCharacterAtCursor(e.key);
+                    } else if (e.key === "Backspace") {
                         if (selectionStart !== null && selectionEnd !== null) {
                             const min = Math.min(selectionStart, selectionEnd);
                             const max = Math.max(selectionStart, selectionEnd);
-                            text =
-                                text.slice(0, min) + clipText + text.slice(max);
-                            cursorIndex = min + clipText.length;
+                            text = text.slice(0, min) + text.slice(max);
+                            cursorIndex = min;
                             selectionStart = selectionEnd = null;
-                        } else {
+                        } else if (cursorIndex > 0) {
+                            text =
+                                text.slice(0, cursorIndex - 1) +
+                                text.slice(cursorIndex);
+                            cursorIndex--;
+                        }
+                        generateVertText();
+                    } else if (e.key === "Delete") {
+                        if (cursorIndex < text.length) {
                             text =
                                 text.slice(0, cursorIndex) +
-                                clipText +
-                                text.slice(cursorIndex);
-                            cursorIndex += clipText.length;
+                                text.slice(cursorIndex + 1);
+                            generateVertText();
                         }
-                        generateSVG();
-                    });
-                }
-            });
-
-            function insertSpecialChar(char) {
-                if (text.length >= 50) return;
-                if (selectionStart !== null && selectionEnd !== null) {
-                    const min = Math.min(selectionStart, selectionEnd);
-                    const max = Math.max(selectionStart, selectionEnd);
-                    text = text.slice(0, min) + char + text.slice(max);
-                    cursorIndex = min + 1;
-                    selectionStart = selectionEnd = null;
-                } else {
-                    text =
-                        text.slice(0, cursorIndex) +
-                        char +
-                        text.slice(cursorIndex);
-                    cursorIndex++;
-                }
-                generateSVG();
+                    } else if (e.key === "ArrowUp") {
+                        if (cursorIndex > 0) {
+                            cursorIndex--;
+                            generateVertText();
+                        }
+                    } else if (e.key === "ArrowDown") {
+                        if (cursorIndex < text.length) {
+                            cursorIndex++;
+                            generateVertText();
+                        }
+                    } else if (
+                        isMetaKeyPressed(e) &&
+                        e.key.toLowerCase() === "a"
+                    ) {
+                        e.preventDefault();
+                        selectionStart = 0;
+                        selectionEnd = text.length;
+                        generateVertText();
+                    } else if (
+                        isMetaKeyPressed(e) &&
+                        e.key.toLowerCase() === "c"
+                    ) {
+                        if (selectionStart !== null && selectionEnd !== null) {
+                            const min = Math.min(selectionStart, selectionEnd);
+                            const max = Math.max(selectionStart, selectionEnd);
+                            navigator.clipboard.writeText(text.slice(min, max));
+                        }
+                    } else if (
+                        isMetaKeyPressed(e) &&
+                        e.key.toLowerCase() === "v"
+                    ) {
+                        navigator.clipboard.readText().then((clipText) => {
+                            if (text.length + clipText.length > 50)
+                                clipText = clipText.slice(0, 50 - text.length);
+                            vtAddCharacterAtCursor(clipText);
+                        });
+                    }
+                });
             }
 
-            // Initialize
-            generateSVG();
+            document
+                .getElementById("vt_spacing_input")
+                .addEventListener("input", generateVertText);
+            document
+                .getElementById("vt_scale_input")
+                .addEventListener("input", generateVertText);
+
+            function clearAll() {
+                text = "";
+                cursorIndex = 0;
+                selectionStart = null;
+                selectionEnd = null;
+                generateVertText();
+            }
+
+            document
+                .getElementById("vt_spacing_input")
+                .addEventListener("input", generateVertText);
+            document
+                .getElementById("vt_scale_input")
+                .addEventListener("input", generateVertText);
+
+            document
+                .getElementById("vt_hidden_input")
+                .addEventListener("keydown", (e) => {
+                    if (e.key === "Backspace") {
+                        if (cursorIndex > 0) {
+                            text =
+                                text.slice(0, cursorIndex - 1) +
+                                text.slice(cursorIndex);
+                            cursorIndex--;
+                            generateVertText();
+                        }
+                        e.preventDefault();
+                    }
+                });
+
+            generateVertText();
         </script>
     </body>
 </html>

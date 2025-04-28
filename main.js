@@ -1,4 +1,13 @@
+window.addEventListener("DOMContentLoaded", function () {
+  assembleGrid();
+  replaceJobTitles();
+  setupVideoInitial();
+});
+
 window.addEventListener("resize", function () {
+  positionGridItems(true);
+});
+screen.orientation.addEventListener("change", function () {
   positionGridItems(true);
 });
 
@@ -111,6 +120,7 @@ function getSegment() {
 }
 
 function openPanel(event) {
+  console.log("panelopen");
   const panelId = event.currentTarget.parentElement.id;
   const panel = document.querySelector(`.panel[id="${panelId}"]`);
   panel.classList.add("open");
@@ -118,7 +128,10 @@ function openPanel(event) {
 
   const openData = openPanelData[panelId];
   const openContent = panel.querySelector(".open_content");
-  if (openData.html) openContent.innerHTML = openData.html;
+  const contentScroll = document.createElement("div");
+  contentScroll.classList.add("main_content_scroll");
+  openContent.appendChild(contentScroll);
+  if (openData.html) contentScroll.innerHTML = openData.html;
   if (openData.action) openData.action();
 
   readDialogue(openData.dialogue);
@@ -132,7 +145,17 @@ function newItemChecks() {
   checkDownloadButtons();
 }
 
+let resizeTimeout;
+
 function positionGridItems(resize) {
+  if (resize) {
+    document.documentElement.classList.add("resizing");
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(function () {
+      document.documentElement.classList.remove("resizing");
+    }, 500);
+  }
+
   const panels = document.querySelectorAll(".panel");
   const gap = getGap();
   const segmentWidth = getSegment().width;
@@ -142,7 +165,6 @@ function positionGridItems(resize) {
   const openPanel = document.querySelector(".panel.open");
 
   panels.forEach((panel) => {
-    if (resize) panel.style.transition = "none";
     const itemData = gridItems.find((item) => item.id === panel.id).bpoints[
       bPoint
     ];
@@ -152,11 +174,8 @@ function positionGridItems(resize) {
       const containerW = width - gap;
       const containerH = height - gap;
 
-      let panelSize = JSON.parse(
-        JSON.stringify(
-          gridItems.find((item) => item.id === panel.id).open[bPoint],
-        ),
-      );
+      const gridItemData = gridItems.find((item) => item.id === panel.id);
+      let panelSize = JSON.parse(JSON.stringify(gridItemData.open[bPoint]));
       panelSize[0] =
         panelSize[0] === "100%" || panelSize[0] > containerW
           ? containerW
@@ -190,25 +209,47 @@ function positionGridItems(resize) {
       panel.style.top = `${itemData.pos[1] * (segmentHeight + gap)}px`;
     }
 
-    if (resize)
-      setTimeout(function () {
-        panel.style.transition = "";
-      }, 200);
+    if (resize) {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(function () {
+        document.documentElement.classList.remove("resizing");
+      }, 500);
+    }
   });
 }
 
 function resetGrid() {
+  document.activeElement.blur();
+  let timeoutTime = 10;
+
+  if (isTouchDevice) {
+    const openID = document.querySelector(".panel.open").id;
+    if (
+      openID === "metadata" ||
+      openID === "analogie" ||
+      openID === "instrument"
+    )
+      timeoutTime = 300;
+  }
+  const openPanel = document.querySelector(".panel.open");
+  if (openPanel) openPanel.classList.add("closing");
   const panels = document.querySelectorAll(".panel");
-  panels.forEach((p) => {
-    p.classList.remove("open", "shifted");
-  });
-  textBoxClose(true);
-  positionGridItems();
+  setTimeout(function () {
+    panels.forEach((p) => {
+      p.classList.remove("open", "shifted");
+    });
+    textBoxClose(true);
+    positionGridItems();
+    vtClearAll();
+  }, timeoutTime);
   setTimeout(() => {
     panels.forEach((p) => {
-      p.querySelector(".open_content").innerHTML = "";
+      if (!p.classList.contains("open"))
+        p.querySelector(".open_content").innerHTML = "";
     });
-  }, 500);
+    const closingPanel = document.querySelector(".panel.closing");
+    if (closingPanel) closingPanel.classList.remove("closing");
+  }, timeoutTime + 500);
 }
 
 function addCorners() {
@@ -325,6 +366,109 @@ function setupDynamics() {
     },
   );
 }
+function setupMetadata() {
+  if (!isTouchDevice) {
+    vtSetupDesktop();
+  } else {
+    document
+      .getElementById("vt_hidden_input")
+      .addEventListener("input", (e) => {
+        const value = e.target.value;
+        if (value.length > 0) {
+          vtAddCharacterAtCursor(value);
+          e.target.value = "";
+        }
+      });
+  }
+  const spacingInput = document.querySelector("#vt_spacing_input");
+  const scaleInput = document.querySelector("#vt_scale_input");
+  const hiddenInput = document.querySelector("#vt_hidden_input");
+
+  spacingInput.addEventListener("input", generateVertText);
+  scaleInput.addEventListener("input", generateVertText);
+  spacingInput.addEventListener("input", generateVertText);
+  scaleInput.addEventListener("input", generateVertText);
+
+  hiddenInput.addEventListener("keydown", (e) => {
+    if (e.key === "Backspace") {
+      if (cursorIndex > 0) {
+        vtText = vtText.slice(0, cursorIndex - 1) + vtText.slice(cursorIndex);
+        cursorIndex--;
+        generateVertText();
+      }
+      e.preventDefault();
+    }
+  });
+
+  const sliderButtons = document.querySelectorAll(
+    ".inline_button.slider_button",
+  );
+  for (const button of sliderButtons) {
+    button.addEventListener("click", vertSliderButtonHandler);
+  }
+  document
+    .querySelector(".panel#metadata button.specialty")
+    .addEventListener("click", resetGrid);
+  generateVertText();
+}
+
+function setupJobs() {
+  let panel = document.querySelector(".panel#jobs");
+  panel.querySelector(".open_content").setAttribute("needs_corners", "true");
+  panel
+    .querySelector(".inline_button.emphasis")
+    .addEventListener("click", function () {
+      replaceJobTitles();
+    });
+  replaceJobTitles(true);
+}
+
+function setupRunes() {
+  let panel = document.querySelector(".panel#runes");
+  const content = panel.querySelector(".open_content");
+  content.setAttribute("time", "future");
+  const times = ["past", "present", "future"];
+  panel
+    .querySelector(".viewport_button")
+    .addEventListener("click", function () {
+      const currentTime = content.getAttribute("time");
+      const nextTime =
+        times[(times.indexOf(currentTime) - 1 + times.length) % times.length];
+      content.setAttribute("time", nextTime);
+    });
+}
+
+function setupVideo() {
+  const panel = document.querySelector(".panel#video");
+  const video = panel.querySelector("video");
+  video.setAttribute("controls", "");
+}
+
+let videoAspected = false;
+
+function setupVideoInitial() {
+  const panel = document.querySelector(".panel#video");
+  const video = panel.querySelector("video");
+  const videoContainer = panel.querySelector("#main_video_container");
+  const loopStart = 0; // seconds
+  const loopEnd = 26; // seconds
+  video.addEventListener("timeupdate", function () {
+    if (video.currentTime >= loopEnd + 1 && panel.classList.contains("open")) {
+      if (videoAspected) return;
+      videoContainer.classList.add("aspected");
+      videoAspected = true;
+    } else if (
+      video.currentTime >= loopEnd &&
+      !panel.classList.contains("open")
+    ) {
+      video.currentTime = loopStart;
+      video.play();
+    } else {
+      videoContainer.classList.remove("aspected");
+      videoAspected = false;
+    }
+  });
+}
 
 // TAB BUTTONS
 
@@ -337,5 +481,3 @@ function getTabInfo(container) {
   nextTab.classList.add("active");
   return nextTab.getAttribute("tab");
 }
-
-assembleGrid();

@@ -4,7 +4,10 @@
         <meta charset="UTF-8" />
         <meta http-equiv="Content-Language" content="en" />
         <meta name="google" content="notranslate" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content, maximum-scale=1.0, user-scalable=0"
+        />
         <title>Scene Brand</title>
         <link rel="stylesheet" href="styles.css" />
         <link rel="stylesheet" href="icons.css" />
@@ -18,18 +21,6 @@
         />
     </head>
     <body>
-        <canvas
-            id="textCanvas"
-            width="500"
-            height="200"
-            style="display: none"
-        ></canvas>
-        <svg
-            id="output"
-            width="500"
-            height="200"
-            xmlns="http://www.w3.org/2000/svg"
-        ></svg>
         <section id="about">
             <h1>Scene</h1>
             <p>Lorem ipsum dolar sit amet</p>
@@ -41,6 +32,20 @@
             <button class="textbox_button next" state="fast"></button>
             <button class="textbox_button exit"></button>
         </div>
+        <span class="hide">
+            <canvas
+                id="textCanvas"
+                width="500"
+                height="200"
+                style="display: none"
+            ></canvas>
+            <svg
+                id="output"
+                width="500"
+                height="200"
+                xmlns="http://www.w3.org/2000/svg"
+            ></svg>
+        </span>
         <section id="panels"></section>
         <section id="metadata"></section>
         <script src="data.js"></script>
