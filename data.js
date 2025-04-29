@@ -191,10 +191,14 @@ const gridItems = [
       background: "#1F1F1F",
       html: `
       <div>
-        <h1 class="past"><span class="icon"></span><span class="title">Pixel</span></h1>
+        <h1 class="past"><svg class="arrow_icon" viewBox="0 0 87 47" xmlns="http://www.w3.org/2000/svg">
+        <path d="M87 23.5529L63.6245 47V27.5482H2.6226e-06V19.4518H63.6245V0L87 23.5529Z"/>
+        </svg><span class="title">Pixel</span></h1>
       </div>
       <div>
-        <h1 class="future"><span class="icon"></span><span class="title">Alchemist</span></h1>
+        <h1 class="future"><svg class="arrow_icon" viewBox="0 0 87 47" xmlns="http://www.w3.org/2000/svg">
+        <path d="M87 23.5529L63.6245 47V27.5482H2.6226e-06V19.4518H63.6245V0L87 23.5529Z"/>
+        </svg><span class="title">Alchemist</span></h1>
       </div>
       `,
     },
@@ -688,7 +692,7 @@ const letterHeights = {
   9: 720,
 
   default: 720,
-  space: 720,
+  space: 160,
 };
 
 const letterWidths = {

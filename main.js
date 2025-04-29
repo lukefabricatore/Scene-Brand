@@ -96,6 +96,12 @@ function getGap() {
   else return 5;
 }
 function getBreakpoint() {
+  const screenAspect = window.innerWidth / window.innerHeight;
+  if (window.innerWidth > 1150) return "desk";
+  else if (screenAspect >= 1.2) return "desk";
+  else return "mob";
+}
+function getOpenBreakpoint() {
   if (window.innerWidth > 1150) return "desk";
   else return "mob";
 }
@@ -170,12 +176,13 @@ function positionGridItems(resize) {
     ];
 
     if (openPanel && panel === openPanel) {
+      const openBPoint = getOpenBreakpoint();
       const { width, height } = getSize();
       const containerW = width - gap;
       const containerH = height - gap;
 
       const gridItemData = gridItems.find((item) => item.id === panel.id);
-      let panelSize = JSON.parse(JSON.stringify(gridItemData.open[bPoint]));
+      let panelSize = JSON.parse(JSON.stringify(gridItemData.open[openBPoint]));
       panelSize[0] =
         panelSize[0] === "100%" || panelSize[0] > containerW
           ? containerW

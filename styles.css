@@ -22,6 +22,7 @@ html {
     -khtml-user-select: none;
     -ms-user-select: none;
     scrollbar-width: none;
+    touch-action: manipulation;
 }
 *::-webkit-scrollbar {
     display: none;
@@ -47,6 +48,7 @@ span.hide {
 video:fullscreen {
     object-fit: contain !important;
 }
+
 @media (max-width: 850px) {
     * {
         --radius: 24px;
@@ -142,6 +144,7 @@ p {
 @media (hover: hover) {
     .panel:hover {
         transform: scale(1.02);
+        z-index: 1;
     }
     .panel.open:hover {
         transform: scale(1);
@@ -150,6 +153,7 @@ p {
 @media (hover: none) {
     .panel:active {
         transform: scale(1.02);
+        z-index: 1;
     }
     .panel.open:active {
         transform: scale(1);
@@ -368,6 +372,7 @@ p {
     left: 14px;
     bottom: 14px;
     opacity: 0;
+    white-space: nowrap;
 }
 @media (hover: hover) {
     .panel:hover .tooltip {
@@ -540,6 +545,64 @@ button.inline_button .tab svg path {
     margin: 0;
     display: flex;
     justify-content: center;
+}
+
+/* ******************* */
+/* ******************* */
+/* ******************* */
+/* FIX SCALE MESSAGE */
+/* ******************* */
+/* ******************* */
+/* ******************* */
+
+.fix_scale_message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: black;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+}
+.fix_scale_message img {
+    height: 24px;
+    margin-top: 20px;
+}
+.fix_scale_message span {
+    max-width: 550px;
+}
+.fix_scale_message h1 {
+    font-size: 50px;
+    color: white;
+    margin: 0 0 10px 0;
+    font-family: "Instrument Serif";
+    font-weight: normal;
+}
+.fix_scale_message h1::before {
+    content: "It's not you, it's us";
+}
+.fix_scale_message p {
+    font-size: 24px;
+    color: var(--energyburst);
+    margin: 0;
+    font-family: "Instrument Sans";
+    letter-spacing: 0;
+    font-weight: 400;
+    line-height: 1.1em;
+}
+.fix_scale_message p::before {
+    content: "We haven't designed an experience for that screen size yet. If you can, try resizing your window or rotating your device.";
+}
+@media (min-aspect-ratio: 22/5) {
+    .fix_scale_message {
+        opacity: 1;
+        pointer-events: auto;
+    }
 }
 
 /* ******************* */
@@ -938,6 +1001,7 @@ input[type="number"] {
 #analogie_char_container p {
     all: unset;
 }
+
 @media screen and (max-width: 1150px) {
     #analogie_char_container {
         grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
@@ -952,6 +1016,12 @@ input[type="number"] {
         grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
         grid-template-rows: 1fr 1fr 1fr;
         font-size: 4vh;
+    }
+}
+@media (min-aspect-ratio: 6/5) and (max-width: 1150px) {
+    #analogie_char_container {
+        grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+        grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr;
     }
 }
 
@@ -1029,27 +1099,31 @@ input[type="number"] {
     align-items: center;
     justify-content: space-between;
 }
+.panel[id="jobs"] .thumb_content h1 .title {
+    max-width: calc(100% - 40px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .panel[id="jobs"] .thumb_content h1.future {
     font-family: "Instrument Serif";
 }
-.panel[id="jobs"] .thumb_content h1 span.icon::before {
-    content: "→";
-    color: var(--energyburst);
-    font-family: "Instrument Serif";
-    float: left;
-    vertical-align: super;
+svg.arrow_icon {
+    width: 3vh;
+    vertical-align: middle;
 }
+svg.arrow_icon path {
+    fill: var(--energyburst);
+}
+.panel[id="jobs"] .thumb_content h1.past svg.arrow_icon {
+    transform: scaleX(-1);
+}
+
+/* APPLE */
 @supports (hanging-punctuation: first) and (font: -apple-system-body) and
     (-webkit-appearance: none) {
-    .panel[id="jobs"] .thumb_content h1 span.icon::before {
-        vertical-align: unset;
-    }
 }
-.panel[id="jobs"] .thumb_content h1.past span.icon::before {
-    content: "←";
-    color: var(--energyburst);
-    font-family: "Instrument Serif";
-}
+
 @media screen and (max-width: 1150px) {
     .panel[id="jobs"] .thumb_content {
         flex-direction: row;
@@ -1066,13 +1140,14 @@ input[type="number"] {
         text-align: left;
         padding: 0;
         font-size: 2vw;
+        white-space: nowrap;
     }
     .panel[id="jobs"] .thumb_content div:nth-child(1) {
         border: none;
     }
-    .panel[id="jobs"] .thumb_content h1 span.icon::before {
-        float: none;
-        margin: 0 5px 0 0;
+    svg.arrow_icon {
+        margin: -3px 6px 0 0;
+        height: 10px;
     }
 }
 @media only screen and (max-width: 650px) {
@@ -1082,10 +1157,50 @@ input[type="number"] {
     .panel[id="jobs"] .thumb_content h1 {
         font-size: 6.5vw;
     }
-    .panel[id="jobs"] .thumb_content h1 span.icon::before {
-        color: white;
+    .panel[id="jobs"] .thumb_content h1.future svg.arrow_icon path {
+        fill: white;
     }
 
+    .panel[id="jobs"] .thumb_content h1 span.title {
+        display: none;
+    }
+}
+@media (min-aspect-ratio: 6/5) and (max-width: 1150px) {
+    .panel[id="jobs"] .thumb_content {
+        flex-direction: column;
+        justify-content: center;
+        align-items: left;
+    }
+    .panel[id="jobs"] .thumb_content div {
+        width: 100%;
+    }
+    .panel[id="jobs"] .thumb_content h1 {
+        width: 100%;
+        display: flex;
+        padding: 0 10px;
+        font-size: 3vh;
+    }
+    .
+}
+@media (min-aspect-ratio: 9/5) and (max-width: 1150px) {
+    .panel[id="jobs"] .thumb_content {
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+    }
+    .panel[id="jobs"] .thumb_content div {
+        flex: unset;
+        width: auto;
+    }
+    .panel[id="jobs"] .thumb_content h1 {
+        width: auto;
+        padding: 0;
+        white-space: nowrap;
+    }
+    .panel[id="jobs"] .thumb_content h1.future svg.arrow_icon path {
+        fill: white;
+    }
     .panel[id="jobs"] .thumb_content h1 span.title {
         display: none;
     }
@@ -1173,6 +1288,15 @@ input[type="number"] {
         object-fit: cover;
     }
 }
+@media (min-aspect-ratio: 6/5) and (max-width: 1150px) {
+    .panel[id="runes"] #runes_container .action_bar {
+        height: 12%;
+    }
+    .panel[id="runes"] #runes_blur {
+        height: 12%;
+    }
+}
+
 /* METADATA PANEL */
 .panel[id="metadata"] .thumb_content {
     display: flex;
@@ -1335,6 +1459,12 @@ input[type="number"] {
         bottom: 16px;
         left: 16px;
     }
+}
+@media (min-aspect-ratio: 6/5) and (max-width: 1150px) {
+    #color_grid {
+        grid-template-rows: 1fr 1fr 100px;
+    }
+
 }
 
 /* INSTRUMENT PANEL */
