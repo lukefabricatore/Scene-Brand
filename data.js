@@ -256,9 +256,12 @@ const openPanelData = {
         </div>
         <div class="left_content">
             <div class="button_strip">
-              <button onclick="insertSpecialChar('■')"><div class="sceneaction"></div></button>
-              <button onclick="insertSpecialChar('▤')"><div class="scenesprout"></div></button>
-              <button onclick="insertSpecialChar('▢')"><div class="sceneloop"></div></button>
+              <button char="↕"><div class="scene1px"></div></button>
+              <button char="▤"><div class="scenesprout"></div></button>
+              <button char="■"><div class="sceneaction-vertical"></div></button>
+              <button char="•"><div class="scenebullet"></div></button>
+              <button char="←"><div class="scenearrow-left"></div></button>
+              <button char="→"><div class="scenearrow-right"></div></button>
             </div>
 
             <!--<button onclick="vtClearAll()">Clear All</button>-->
@@ -538,6 +541,8 @@ const letterPaths = {
   ".": "M0,0v80h80v-80Z",
   "→": "M240,80L240,0L160,0L160,80L240,80ZM320,160L320,80L240,80L240,160L320,160ZM320,400L400,400L400,320L480,320L480,240L400,240L400,160L320,160L320,240L0,240L0,320L320,320L320,400ZM240,480L160,480L160,560L240,560L240,480ZM320,400L240,400L240,480L320,480L320,400Z",
   "←": "M240,80L240,0L320,0L320,80L240,80ZM160,160L160,80L240,80L240,160L160,160ZM160,400L80,400L80,320L0,320L0,240L80,240L80,160L160,160L160,240L480,240L480,320L160,320L160,400ZM240,480L320,480L320,560L240,560L240,480ZM160,400L240,400L240,480L160,480L160,400Z",
+  "↕": " ",
+  "'": "M80 0H0V160H80V0Z",
   // Uppercase letters
   A: "M80,0v80h160V0H80ZM80,720H0V80h80v320h160V80h80v640h-80v-240H80v240Z",
   B: "M240,320v320h80v-320h-80ZM240,80v160h80V80h-80ZM240,720H0V0h240v80H80v160h160v80H80v320h160v80Z",
@@ -610,6 +615,7 @@ const letterPaths = {
 const letterHeights = {
   "▤": 720,
   "↕": 80,
+  "'": 160,
   "■": 320,
   "•": 320, // Bullet height
   "@": 720, // @ symbol height
@@ -696,6 +702,7 @@ const letterHeights = {
 };
 
 const letterWidths = {
+  "'": 80,
   "▤": 560, // This character is wider
   "↕": 320,
   "■": 320,

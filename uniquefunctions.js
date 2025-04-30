@@ -123,7 +123,8 @@ function vtAddCharacterAtCursor(chars) {
   generateVertText();
 }
 
-function insertSpecialChar(char) {
+function insertSpecialChar(e) {
+  const char = e.currentTarget.getAttribute("char");
   vtAddCharacterAtCursor(char);
 }
 
@@ -160,6 +161,7 @@ function generateVertText() {
   let highlightContent = "";
   let maxWidth = 0;
   const elements = [];
+  const noSpacingSet = new Set(["■", "↕"]);
 
   for (let i = 0; i < displayText.length; i++) {
     const char = displayText[i];
@@ -183,7 +185,10 @@ function generateVertText() {
 
     yOffset += letterHeight;
     if (!isLastChar) {
-      if (!(char === "■" && nextChar === "■")) {
+      const isNoSpacingPair =
+        (noSpacingSet.has(char) && noSpacingSet.has(nextChar)) ||
+        nextChar === "↕";
+      if (!isNoSpacingPair) {
         yOffset += spacing * 80;
       }
     }
@@ -214,7 +219,10 @@ function generateVertText() {
       const nextChar = vtText[i + 1];
       const letterHeight = letterHeights[char] || letterHeights.space || 720;
       cursorYOffset += letterHeight;
-      if (!(char === "■" && nextChar === "■")) {
+      const isNoSpacingPair =
+        (noSpacingSet.has(char) && noSpacingSet.has(nextChar)) ||
+        nextChar === "↕";
+      if (!isNoSpacingPair) {
         cursorYOffset += spacing * 80;
       }
     }

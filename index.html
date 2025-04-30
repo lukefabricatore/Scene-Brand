@@ -4,6 +4,7 @@
         <meta charset="UTF-8" />
         <meta http-equiv="Content-Language" content="en" />
         <meta name="google" content="notranslate" />
+        <meta name="theme-color" content="#ffffff" />
         <meta
             name="viewport"
             content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content, maximum-scale=1.0, user-scalable=0"
@@ -19,8 +20,30 @@
             href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wdth,wght@0,75..100,400..700;1,75..100,400..700&family=Instrument+Serif:ital@0;1&display=swap"
             rel="stylesheet"
         />
+
+        <!-- FAVICON -->
+        <!-- FAVICON -->
+        <link
+            rel="icon"
+            type="image/png"
+            href="./assets/favicon/favicon-96x96.png"
+            sizes="96x96"
+        />
+        <link
+            rel="icon"
+            type="image/svg+xml"
+            href="./assets/favicon/favicon.svg"
+        />
+        <link rel="shortcut icon" href="./assets/favicon/favicon.ico" />
+        <link
+            rel="apple-touch-icon"
+            sizes="180x180"
+            href="./assets/favicon/apple-touch-icon.png"
+        />
+        <meta name="apple-mobile-web-app-title" content="Scene" />
+        <link rel="manifest" href="./assets/favicon/site.webmanifest" />
     </head>
-    <body>
+    <body data-captions="true">
         <section id="about">
             <h1>Scene</h1>
             <p>Lorem ipsum dolar sit amet</p>
@@ -56,8 +79,83 @@
                 />
             </span>
         </div>
+        <
         <section id="panels"></section>
-        <section id="metadata"></section>
+        <section id="main_metadata">
+            <button id="cap_button">
+                <svg viewBox="0 0 56 312">
+                    <path
+                        d="M36 40V48H44V40H36ZM20 0V8H36V0H20ZM36 8V16H44V8H36ZM12 8V48H20V8H12ZM20 48V56H36V48H20Z"
+                    />
+                    <path
+                        d="M36 96V80H44V128H20V120H36V104H20V96H36ZM12 104V120H20V104H12ZM20 72V80H12V88H20V80H36V72H20Z"
+                    />
+                    <path
+                        d="M36 152H20V144H36V152ZM36 152V192H20V200H12V152H20V184H44V152H36Z"
+                    />
+                    <path
+                        class="metadata_switch"
+                        id="switch_on"
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        d="M4 256V224H12V216H44V224H52V256H44V304H36V264H20V304H12V256H4ZM36 304V312H20V304H36Z"
+                    />
+                    <path
+                        class="metadata_switch"
+                        id="switch_off"
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        d="M4 304L4 272L12 272L12 224H20L20 264H36L36 224H44L44 272H52L52 304H44L44 312L12 312L12 304H4ZM20 224L20 216L36 216V224L20 224ZM44 296L44 280H36V272H20L20 280L12 280L12 296L20 296L20 304H36L36 296H44Z"
+                    />
+                </svg>
+            </button>
+            <svg
+                class="action_tread"
+                id="action_tread_short"
+                viewBox="0 0 56 96"
+            >
+                <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M28 64V72H20V80H12V64H20V56H28V48H36V40H44V56H36V64H28ZM28 32V40H20V48H12V32H20V24H28V16H36V8H44V24H36V32H28ZM12 0H28V8H20V16H12V0ZM36 72H44V88H36V96H20V88H28V80H36V72Z"
+                    fill="white"
+                />
+            </svg>
+            <svg
+                class="action_tread"
+                id="action_tread_long"
+                viewBox="0 0 56 288"
+            >
+                <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M28 96V104H20V112H12V96H20V88H28V80H36V72H44V88H36V96H28ZM28 192V200H20V208H12V192H20V184H28V176H36V168H44V184H36V192H28ZM28 64V72H20V80H12V64H20V56H28V48H36V40H44V56H36V64H28ZM28 32V40H20V48H12V32H20V24H28V16H36V8H44V24H36V32H28ZM12 0H28V8H20V16H12V0ZM28 160V168H20V176H12V160H20V152H28V144H36V136H44V152H36V160H28ZM28 128V136H20V144H12V128H20V120H28V112H36V104H44V120H36V128H28ZM28 256V264H20V272H12V256H20V248H28V240H36V232H44V248H36V256H28ZM28 224V232H20V240H12V224H20V216H28V208H36V200H44V216H36V224H28ZM36 264H44V280H36V288H20V280H28V272H36V264Z"
+                />
+            </svg>
+            <button id="scene_button">
+                <svg viewBox="0 0 56 448">
+                    <path
+                        d="M8 8V16H16V8H8ZM24 40V56H32V40H24ZM8 24V16H0V24H8ZM8 24V32H24V24H8ZM16 0V8H24V0H16ZM32 8V16H48V8H32ZM24 16V24H32V16H24ZM32 32V40H40V32H32ZM40 24V32H48V24H40ZM48 16V24H56V16H48ZM24 64V72H32V64H24Z"
+                    />
+                    <path
+                        d="M36 96V112H44V96H36ZM36 96H20V120H28V112H12V96H20V88H36V96ZM36 128V152H44V128H36ZM36 128V120H28V128H36ZM20 152V160H36V152H20ZM12 136V152H20V136H12Z"
+                    />
+                    <path
+                        d="M36 216V224H44V216H36ZM20 176V184H36V176H20ZM36 184V192H44V184H36ZM12 184V224H20V184H12ZM20 224V232H36V224H20Z"
+                    />
+                    <path
+                        d="M20 280V296H12V256H20V272H36V256H44V280H20ZM20 248V256H36V248H20ZM36 288V296H20V304H36V296H44V288H36Z"
+                    />
+                    <path
+                        d="M12 328V376H20V328H12ZM36 328V320H20V328H36ZM36 328V376H44V328H36Z"
+                    />
+                    <path
+                        d="M20 424V440H12V400H20V416H36V400H44V424H20ZM20 392V400H36V392H20ZM36 432V440H20V448H36V440H44V432H36Z"
+                    />
+                </svg>
+                <a href="https://scene.mov" target="_blank"></a>
+            </button>
+        </section>
         <script src="data.js"></script>
         <script src="main.js"></script>
         <script src="dialogue.js"></script>

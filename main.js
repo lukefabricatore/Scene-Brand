@@ -2,6 +2,12 @@ window.addEventListener("DOMContentLoaded", function () {
   assembleGrid();
   replaceJobTitles();
   setupVideoInitial();
+  const capButton = document.querySelector("#cap_button");
+  capButton.addEventListener("click", toggleCaptions);
+  const captionsPref = getCookie("captions");
+  console.log(captionsPref);
+  if (captionsPref === false)
+    document.body.setAttribute("data-captions", "false");
 });
 
 window.addEventListener("resize", function () {
@@ -10,6 +16,16 @@ window.addEventListener("resize", function () {
 screen.orientation.addEventListener("change", function () {
   positionGridItems(true);
 });
+
+function toggleCaptions() {
+  if (document.body.getAttribute("data-captions") === "true") {
+    document.body.setAttribute("data-captions", "false");
+    setCookie("captions", 0);
+  } else {
+    document.body.setAttribute("data-captions", "true");
+    setCookie("captions", 1);
+  }
+}
 
 function assembleGrid() {
   const grid = document.querySelector("#panels");
@@ -416,6 +432,11 @@ function setupMetadata() {
   document
     .querySelector(".panel#metadata button.specialty")
     .addEventListener("click", resetGrid);
+  document
+    .querySelectorAll(".panel#metadata .button_strip button")
+    .forEach((button) => {
+      button.addEventListener("click", insertSpecialChar);
+    });
   generateVertText();
 }
 
@@ -487,4 +508,20 @@ function getTabInfo(container) {
   activeTab.classList.remove("active");
   nextTab.classList.add("active");
   return nextTab.getAttribute("tab");
+}
+
+// COOKIES
+
+function setCookie(name, value) {
+  document.cookie = `${name}=${value ? 1 : 0}; path=/`;
+}
+function getCookie(name) {
+  const cookies = document.cookie.split(";");
+  for (let cookie of cookies) {
+    const [key, val] = cookie.trim().split("=");
+    if (key === name) {
+      return val === "1" ? true : false;
+    }
+  }
+  return null;
 }
