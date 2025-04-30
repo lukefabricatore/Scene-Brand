@@ -30,6 +30,8 @@ function setupCustomSlider(
     const [snappedVal, isSnapped] = maybeSnap(value);
     if (isSnapped) {
       fill.classList.add("snapped");
+      console.log("Snapped to", snappedVal);
+      navigator.vibrate(200);
       setTimeout(() => {
         fill.classList.remove("snapped");
       }, 200);
