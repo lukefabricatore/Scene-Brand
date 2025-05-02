@@ -22,7 +22,6 @@
         />
 
         <!-- FAVICON -->
-        <!-- FAVICON -->
         <link
             rel="icon"
             type="image/png"
@@ -46,7 +45,32 @@
     <body data-captions="true">
         <section id="about">
             <h1>Scene</h1>
-            <p>Lorem ipsum dolar sit amet</p>
+            <p>
+                At Scene, we operate at the intersection of design, animation,
+                and imagination. We’re a hybrid studio — equal parts client
+                partner and internal creative engine — built to stretch across
+                formats, timelines, and disciplines. Our work spans motion
+                systems, visual effects, filmmaking, and interactive media, but
+                at the core of it all is a restless curiosity. Scene was founded
+                on the belief that form should follow idea, and idea should
+                never sit still. Our identity is as flexible as our thinking.
+                Rather than lock ourselves into a single logo, Scene uses a
+                dynamic mark that shifts across a continuum — a system shaped by
+                time. We work in three tonal modes: The future — organic and
+                fluid, always reaching; The present — refined, balanced, focused
+                on clarity and storytelling; and The past — pixelated and
+                referential, echoing the digital textures that shaped us. Each
+                style expresses a different voice, but all share a common
+                anchor: a visual language designed to adapt, interpolate, and
+                evolve. This isn’t a brand frozen in place — it’s a responsive
+                framework. Every project becomes a new expression of the system.
+                The logo morphs, the type flexes, the mark transforms — not to
+                be clever, but to stay honest to the creative environment it's
+                made for. That’s how we see branding: not just as a container
+                for identity, but as a living part of the work. At Scene, motion
+                isn’t a medium — it’s a mindset. Welcome to the place where
+                heart meets machine.
+            </p>
         </section>
         <div id="textbox_container" active="0">
             <canvas id="textbox" width="200" height="130"></canvas>
@@ -69,21 +93,10 @@
                 xmlns="http://www.w3.org/2000/svg"
             ></svg>
         </span>
-        <div class="fix_scale_message">
-            <span>
-                <h1 id="fs_title"></h1>
-                <p id="fs_message"></p>
-                <img
-                    alt="Scene Future Logo"
-                    src="assets/global/scene_future_logo.svg"
-                />
-            </span>
-        </div>
-        <
         <section id="panels"></section>
         <section id="main_metadata">
             <button id="cap_button">
-                <svg viewBox="0 0 56 312">
+                <svg class="vert" viewBox="0 0 56 312">
                     <path
                         d="M36 40V48H44V40H36ZM20 0V8H36V0H20ZM36 8V16H44V8H36ZM12 8V48H20V8H12ZM20 48V56H36V48H20Z"
                     />
@@ -94,23 +107,44 @@
                         d="M36 152H20V144H36V152ZM36 152V192H20V200H12V152H20V184H44V152H36Z"
                     />
                     <path
-                        class="metadata_switch"
-                        id="switch_on"
+                        class="metadata_switch switch_on"
                         fill-rule="evenodd"
                         clip-rule="evenodd"
                         d="M4 256V224H12V216H44V224H52V256H44V304H36V264H20V304H12V256H4ZM36 304V312H20V304H36Z"
                     />
                     <path
-                        class="metadata_switch"
-                        id="switch_off"
+                        class="metadata_switch switch_off"
                         fill-rule="evenodd"
                         clip-rule="evenodd"
                         d="M4 304L4 272L12 272L12 224H20L20 264H36L36 224H44L44 272H52L52 304H44L44 312L12 312L12 304H4ZM20 224L20 216L36 216V224L20 224ZM44 296L44 280H36V272H20L20 280L12 280L12 296L20 296L20 304H36L36 296H44Z"
                     />
                 </svg>
+                <svg class="horiz" viewBox="0 0 224 72">
+                    <path
+                        d="M24 56V64H32V56H24ZM8 16V24H24V16H8ZM24 24V32H32V24H24ZM0 24V64H8V24H0ZM8 64V72H24V64H8Z"
+                    />
+                    <path
+                        d="M64 40V24H72V72H48V64H64V48H48V40H64ZM40 48V64H48V48H40ZM48 16V24H40V32H48V24H64V16H48Z"
+                    />
+                    <path
+                        d="M104 24H88V16H104V24ZM104 24V64H88V72H80V24H88V56H112V24H104Z"
+                    />
+                    <path
+                        class="metadata_switch switch_on"
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        d="M184 16L216 16L216 24L224 24L224 56L216 56L216 64L184 64L184 56L136 56L136 48L176 48L176 32L136 32L136 24L184 24L184 16ZM136 48L128 48L128 32L136 32L136 48Z"
+                    />
+                    <path
+                        class="metadata_switch switch_off"
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        d="M136 16L168 16L168 24L216 24L216 32L176 32L176 48L216 48L216 56L168 56L168 64L136 64L136 56L128 56L128 24L136 24L136 16ZM216 32L224 32L224 48L216 48L216 32ZM144 56L160 56L160 48L168 48L168 32L160 32L160 24L144 24L144 32L136 32L136 48L144 48L144 56Z"
+                    />
+                </svg>
             </button>
             <svg
-                class="action_tread"
+                class="action_tread vert"
                 id="action_tread_short"
                 viewBox="0 0 56 96"
             >
@@ -122,7 +156,7 @@
                 />
             </svg>
             <svg
-                class="action_tread"
+                class="action_tread vert"
                 id="action_tread_long"
                 viewBox="0 0 56 288"
             >
@@ -133,7 +167,7 @@
                 />
             </svg>
             <button id="scene_button">
-                <svg viewBox="0 0 56 448">
+                <svg class="vert" viewBox="0 0 56 448">
                     <path
                         d="M8 8V16H16V8H8ZM24 40V56H32V40H24ZM8 24V16H0V24H8ZM8 24V32H24V24H8ZM16 0V8H24V0H16ZM32 8V16H48V8H32ZM24 16V24H32V16H24ZM32 32V40H40V32H32ZM40 24V32H48V24H40ZM48 16V24H56V16H48ZM24 64V72H32V64H24Z"
                     />
@@ -153,9 +187,41 @@
                         d="M20 424V440H12V400H20V416H36V400H44V424H20ZM20 392V400H36V392H20ZM36 432V440H20V448H36V440H44V432H36Z"
                     />
                 </svg>
+                <svg class="horiz" viewBox="0 0 256 72">
+                    <path
+                        d="M8 8V16H16V8H8ZM24 40V56H32V40H24ZM8 24V16H0V24H8ZM8 24V32H24V24H8ZM16 0V8H24V0H16ZM32 8V16H48V8H32ZM24 16V24H32V16H24ZM32 32V40H40V32H32ZM40 24V32H48V24H40ZM48 16V24H56V16H48ZM24 64V72H32V64H24Z"
+                    />
+                    <path
+                        d="M88 8V24H96V8H88ZM88 8H72V32H80V24H64V8H72V0H88V8ZM88 40V64H96V40H88ZM88 40V32H80V40H88ZM72 64V72H88V64H72ZM64 48V64H72V48H64Z"
+                    />
+                    <path
+                        d="M128 56V64H136V56H128ZM112 16V24H128V16H112ZM128 24V32H136V24H128ZM104 24V64H112V24H104ZM112 64V72H128V64H112Z"
+                    />
+                    <path
+                        d="M152 48V64H144V24H152V40H168V24H176V48H152ZM152 16V24H168V16H152ZM168 56V64H152V72H168V64H176V56H168Z"
+                    />
+                    <path
+                        d="M184 24V72H192V24H184ZM208 24V16H192V24H208ZM208 24V72H216V24H208Z"
+                    />
+                    <path
+                        d="M232 48V64H224V24H232V40H248V24H256V48H232ZM232 16V24H248V16H232ZM248 56V64H232V72H248V64H256V56H248Z"
+                    />
+                </svg>
                 <a href="https://scene.mov" target="_blank"></a>
             </button>
         </section>
+        <div class="fix_scale_message">
+            <span>
+                <h1 id="fs_title"></h1>
+                <p id="fs_message"></p>
+                <img
+                    alt="Scene Future Logo"
+                    src="assets/global/scene_future_logo.svg"
+                />
+            </span>
+        </div>
+        <div id="popupmessage"></div>
+
         <script src="data.js"></script>
         <script src="main.js"></script>
         <script src="dialogue.js"></script>

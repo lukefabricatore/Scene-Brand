@@ -1,5 +1,7 @@
 const textBoxCanvas = document.getElementById("textbox");
 const textBoxCtx = textBoxCanvas.getContext("2d");
+const spriteImage = new Image();
+spriteImage.src = "assets/global/analogie_sprite.png";
 
 // Config
 const textBoxNextButton = document.querySelector(".textbox_button.next");
@@ -50,36 +52,31 @@ function textBoxClose(keepDialogue) {
 }
 
 function textBoxGetLetterSize(char) {
-  const rawW = letterWidths[char] || letterWidths.default || 320;
-  const rawH =
-    letterHeights[char] || letterHeights.default || textBoxPathBaseHeight;
-
-  return {
-    width: rawW * textBoxScale,
-    height: rawH * textBoxScale,
-    rawHeight: rawH,
-  };
+  const data = characterSpriteMap[char];
+  if (!data) return { width: 4, height: 11 };
+  return { width: data.width, height: data.height };
 }
 
 function textBoxDrawLetter(char, x, y) {
-  const pathData = letterPaths[char];
-  if (!pathData) return;
-
-  const { rawHeight } = textBoxGetLetterSize(char);
-  const baselineOffset = textBoxLetterHeight - rawHeight * textBoxScale;
-
-  textBoxCtx.save();
-  textBoxCtx.translate(x, y + baselineOffset);
-  textBoxCtx.scale(textBoxScale, textBoxScale);
-  textBoxCtx.fillStyle = "#FFF";
-  textBoxCtx.fill(new Path2D(pathData));
-  textBoxCtx.restore();
+  const sprite = characterSpriteMap[char];
+  if (!sprite) return;
+  textBoxCtx.drawImage(
+    spriteImage,
+    sprite.x,
+    sprite.y,
+    sprite.width,
+    sprite.height,
+    Math.floor(x),
+    Math.floor(y),
+    sprite.width,
+    sprite.height,
+  );
 }
 
 function textBoxDrawText(
   text,
   startX = textBoxCanvasPadding,
-  startY = textBoxCanvasPadding + 16,
+  startY = textBoxCanvasPadding + 15,
 ) {
   textBoxCtx.clearRect(0, 0, textBoxCanvas.width, textBoxCanvas.height);
   textBoxNextButton.setAttribute("state", "fast");
@@ -144,7 +141,7 @@ function textBoxDrawText(
 
     if (x + wordWidth > textBoxCanvas.width - textBoxCanvasPadding) {
       x = textBoxCanvasPadding;
-      y += textBoxLineHeightPx;
+      y += textBoxLineHeightPx + 1;
 
       if (y + textBoxLetterHeight > textBoxCanvas.height - textBoxCanvasPadding)
         return;
@@ -186,7 +183,7 @@ function textBoxDrawTopBar(title) {
   ctx.strokeRect(canvas.width - 13.5, 2.5, 11, 12);
   ctx.restore();
 
-  textBoxDrawLetter("x", canvas.width - 10, 3);
+  textBoxDrawLetter("x", canvas.width - 10, 2);
 
   const textWidth = title.split("").reduce((sum, char) => {
     const { width } = textBoxGetLetterSize(char);
@@ -194,7 +191,7 @@ function textBoxDrawTopBar(title) {
   }, -textBoxSpacingPx);
 
   const textX = Math.floor((canvas.width - textWidth) / 2);
-  const textY = Math.floor((barHeight - textBoxLetterHeight) / 2);
+  const textY = 3;
 
   ctx.clearRect(textX - 4, textY - 2, textWidth + 8, textBoxLetterHeight + 4);
 
@@ -244,7 +241,7 @@ function textBoxDrawNextButton(label = "→") {
   ctx.restore();
 
   let drawX = x + padding;
-  const drawY = y + padding;
+  const drawY = y + padding - 1;
 
   for (let i = 0; i < label.length; i++) {
     const char = label[i];

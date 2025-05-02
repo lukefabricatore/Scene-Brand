@@ -5,7 +5,6 @@ window.addEventListener("DOMContentLoaded", function () {
   const capButton = document.querySelector("#cap_button");
   capButton.addEventListener("click", toggleCaptions);
   const captionsPref = getCookie("captions");
-  console.log(captionsPref);
   if (captionsPref === false)
     document.body.setAttribute("data-captions", "false");
 });
@@ -21,9 +20,11 @@ function toggleCaptions() {
   if (document.body.getAttribute("data-captions") === "true") {
     document.body.setAttribute("data-captions", "false");
     setCookie("captions", 0);
+    sendPopup("CAPTION BOXES OFF");
   } else {
     document.body.setAttribute("data-captions", "true");
     setCookie("captions", 1);
+    sendPopup("CAPTION BOXES ON");
   }
 }
 
@@ -107,7 +108,10 @@ function populateThumbnail(container, item) {
 }
 
 function getGap() {
-  if (window.innerWidth > 850) return 16;
+  const screenAspect = window.innerWidth / window.innerHeight;
+  if (window.innerWidth > 1150) return 16;
+  else if (screenAspect >= 1.2) return 10;
+  else if (window.innerWidth > 850) return 16;
   else if (window.innerWidth > 600) return 10;
   else return 5;
 }
@@ -142,7 +146,6 @@ function getSegment() {
 }
 
 function openPanel(event) {
-  console.log("panelopen");
   const panelId = event.currentTarget.parentElement.id;
   const panel = document.querySelector(`.panel[id="${panelId}"]`);
   panel.classList.add("open");
@@ -245,6 +248,8 @@ function resetGrid() {
   document.activeElement.blur();
   let timeoutTime = 10;
 
+  if (mainVideoEl) fadeVideoVolume(false, mainVideoEl.volume, 0, 1000);
+
   if (isTouchDevice) {
     const openID = document.querySelector(".panel.open").id;
     if (
@@ -297,8 +302,17 @@ function checkCopyButtons() {
     button.addEventListener("click", () => {
       const text = String(button.querySelector("span.copy_content").innerHTML);
       navigator.clipboard.writeText(text);
+      sendPopup(button.getAttribute("copy_message"));
     });
   });
+}
+function sendPopup(message) {
+  const parent = document.getElementById("popupmessage");
+  parent.innerHTML = "";
+  const popup = document.createElement("div");
+  popup.classList.add("popup", "chip");
+  popup.innerHTML = `<h3>${message}</h3>`;
+  parent.appendChild(popup);
 }
 function checkDownloadButtons() {
   const downloadButtons = document.querySelectorAll("[download_button]");
@@ -470,6 +484,9 @@ function setupVideo() {
   const panel = document.querySelector(".panel#video");
   const video = panel.querySelector("video");
   video.setAttribute("controls", "");
+  video.volume = 0;
+  video.muted = false;
+  fadeVideoVolume(video, 0, 1, 1000);
 }
 
 let videoAspected = false;

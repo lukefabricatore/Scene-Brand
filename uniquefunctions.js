@@ -30,7 +30,6 @@ function setupCustomSlider(
     const [snappedVal, isSnapped] = maybeSnap(value);
     if (isSnapped) {
       fill.classList.add("snapped");
-      console.log("Snapped to", snappedVal);
       navigator.vibrate(200);
       setTimeout(() => {
         fill.classList.remove("snapped");
@@ -437,4 +436,59 @@ function replaceJobTitles(useExisting) {
   thumbTitle2.classList = jobTitles[1].type;
   thumbTitle1.querySelector("span.title").textContent = jobTitles[0].title;
   thumbTitle2.querySelector("span.title").textContent = jobTitles[1].title;
+}
+
+// REROUTE BACK
+
+history.pushState({ custom: true }, "", window.location.href);
+
+window.addEventListener("popstate", (event) => {
+  if (event.state && event.state.custom) {
+    const openPanel = document.querySelector(".panel.open");
+    if (openPanel) resetGrid();
+    history.pushState({ custom: true }, "", window.location.href);
+  }
+});
+
+// VIDEO VOLUME FADE
+
+let mainVideoEl;
+let mainAudioInterval;
+
+function fadeVideoVolume(videoEl, startVolume, endVolume, durationMs) {
+  if (videoEl && typeof videoEl.volume !== "number") return;
+  if (!videoEl && !mainVideoEl) return;
+
+  clearInterval(mainAudioInterval);
+
+  if (!videoEl) videoEl = mainVideoEl;
+  else mainVideoEl = videoEl;
+
+  const steps = 30;
+  const intervalTime = durationMs / steps;
+  let currentStep = 0;
+
+  const volumeRange = endVolume - startVolume;
+
+  // Easing functions
+  const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+  const easeInCubic = (t) => t * t * t;
+
+  // Choose easing based on direction
+  const easingFn = volumeRange < 0 ? easeOutCubic : easeInCubic;
+
+  mainAudioInterval = setInterval(() => {
+    currentStep++;
+    const t = currentStep / steps;
+    const easedT = easingFn(t);
+    const newVolume = startVolume + volumeRange * easedT;
+
+    // Use a stable calculation from startVolume only
+    videoEl.volume = Math.min(1, Math.max(0, newVolume));
+
+    if (currentStep >= steps) {
+      videoEl.volume = endVolume;
+      clearInterval(mainAudioInterval);
+    }
+  }, intervalTime);
 }

@@ -82,10 +82,8 @@ const gridItems = [
       background: "#2B3400",
       html: "<div id='analogie_char_container'></div>",
       action: function () {
-        console.log("Analogie action triggered");
         const charString = "abcdefghijklmnopqrstuvwxyz1234";
         for (let i = 0; i < charString.length; i++) {
-          console.log(charString[i], i);
           const letterBox = document.createElement("div");
           letterBox.innerHTML = `<p>${charString[i]}</p>`;
           document
@@ -231,10 +229,9 @@ const openPanelData = {
     dialogue: {
       prog: 0,
       content: [
-        "Hi there, this is just a test.",
-        "What's up.",
-        "This is so cool if it works.",
-        "Honestly, huge if true",
+        "Metadata exists auxiliary to the main content, but provides small, important details.",
+        "Built with our in-house typeface, Analogie, we engineered a stacking system for dynamic placement.",
+        "We use this very tool to supplement our graphics, animations, and documents.",
       ],
     },
     html: `
@@ -290,10 +287,9 @@ const openPanelData = {
     dialogue: {
       prog: 0,
       content: [
-        "This is the instrument.",
-        "It's a long story.",
-        "But it's important.",
-        "So we'll tell it.",
+        "Designed by Instrument, Instrument Serif is sharp, deliberate, and cinematic.",
+        "Its precise forms speak with authority, grounding our voice with something tangible - a printed past reimagined for digital viewports.",
+        "Working in tandem, Instrument Sans carries the quieter work. It is clean, flexible, and dynamic.",
       ],
     },
     html: `
@@ -320,10 +316,9 @@ const openPanelData = {
     dialogue: {
       prog: 0,
       content: [
-        "This is the analogie.",
-        "It's a long story.",
-        "But it's important.",
-        "So we'll tell it.",
+        "We made Analogie to subtly echo the structure of Instrument Serif on a noticeably low resolution monospace pixel grid.",
+        "It's not just retro for the sake of retro - by limiting fidelity, we opened space for imagination.",
+        "The result is a typeface that hums with personality, restraint, and an almost mechanical warmth.",
       ],
     },
     html: `
@@ -340,10 +335,10 @@ const openPanelData = {
       </div>
       <button class='inline_button'>
         <p>GET TYPE SHEET</p>
-        <a href="assets/global/analogie.ttf" download></a>
+        <a href="assets/downloads/Scene_Analogie_TypeSheet.png" download></a>
       </button><button class='inline_button emphasis'>
         <p>GET TTF</p>
-        <a href="assets/global/analogie.ttf" download></a>
+        <a href="assets/downloads/Scene_Analogie.ttf" download></a>
       </button>
     `,
     action: function () {
@@ -354,10 +349,8 @@ const openPanelData = {
     dialogue: {
       prog: 0,
       content: [
-        "This is the dynamics.",
-        "It's a long story.",
-        "But it's important.",
-        "So we'll tell it.",
+        "Scene resides in 3 main timestreams: past, present and future. But between these checkpoints is a spectrum of beauty to be unearthed.",
+        "Slide to explore the transformation of our mark. When you find a version that fits, select 'GET SVG' to create an export.",
       ],
     },
     html: `
@@ -389,9 +382,10 @@ const openPanelData = {
           <p>GET SVG</p>
         </button><button class='inline_button'>
           <p>GET PNG</p>
+          <a href="assets/downloads/Scene_Dynamics.png" download></a>
         </button><button class='inline_button'>
           <p>GET TTF</p>
-          <a href="assets/global/scene_runes.ttf" download></a>
+          <a href="assets/downloads/Scene_Dynamics_VariableFont.ttf" download></a>
         </button>
       </span>
     `,
@@ -403,10 +397,8 @@ const openPanelData = {
     dialogue: {
       prog: 0,
       content: [
-        "This is the runes.",
-        "It's a long story.",
-        "But it's important.",
-        "So we'll tell it.",
+        "Forged from the structure of Instrument and crystalized to form the iconic Scene mark, the runes are a simple yet expressive language.",
+        "The loop, portal, flame, and sprout represent no place, any place, found life, and progressive life, respectively.",
       ],
     },
     html: `
@@ -418,7 +410,7 @@ const openPanelData = {
           </svg>
           <div class="scenesprout"></div>
         </div>
-        <a href="assets/downloads/runes/sprout.mp4" download></a>
+        <a href="assets/downloads/runes/exports/Scene_Sprout.mp4" download></a>
       </div>
       <div class='rune_container loop'>
         <div class='rune_centerer'>
@@ -428,7 +420,7 @@ const openPanelData = {
           </svg>
           <div class="sceneloop"></div>
         </div>
-        <a href="assets/downloads/runes/loop.mp4" download></a>
+        <a href="assets/downloads/runes/exports/Scene_Loop.mp4" download></a>
       </div>
       <div class='rune_container portal'>
         <div class='rune_centerer'>
@@ -438,7 +430,7 @@ const openPanelData = {
           </svg>
           <div class="sceneportal"></div>
         </div>
-        <a href="assets/downloads/runes/portal.mp4?" download></a>
+        <a href="assets/downloads/runes/exports/Scene_Portal.mp4" download></a>
       </div>
       <div class='rune_container flame'>
         <div class='rune_centerer'>
@@ -448,7 +440,7 @@ const openPanelData = {
           </svg>
           <div class="sceneflame"></div>
         </div>
-        <a href="assets/downloads/runes/flame.mp4" download></a>
+        <a href="assets/downloads/runes/exports/Scene_Flame.mp4" download></a>
       </div>
       <button needs_corners="true" class="viewport_button">
         <p></p><div class="spectrum"></div>
@@ -462,33 +454,32 @@ const openPanelData = {
     dialogue: {
       prog: 0,
       content: [
-        "This is the color.",
-        "It's a long story.",
-        "But it's important.",
-        "So we'll tell it.",
+        "All life begins with energy. At our core is a powerful orange spark: we call it Energy Burst.",
+        "Its raw essence creates our most eye-catching content or highlights important details. But we can also dilute its intensity through fusion with white and black. ",
+        "Click on a solid swatch to copy its HEX code, or click on a gradient swatch and paste it into Illustrator, Affinity, or Figma.",
       ],
     },
     html: `
       <div id="color_grid">
-        <div copy_button="true" class="color_cell" color_name="black"><p>BLACK</p><span class='copy_content'>#000000</span></div>
-        <div copy_button="true" class="color_cell" color_name="white"><p>WHITE</p><span class='copy_content'>#FFFFFF</span></div>
-        <div copy_button="true" class="color_cell" color_name="energy_burst"><p>ENERGY BURST</p><span class='copy_content'>#FF9D00</span></div>
-        <div copy_button="true" class="color_cell" color_name="black_spectrum"><p>BLACK SPECTRUM</p>
+        <div copy_button="true" copy_message="HEX COPIED" class="color_cell" color_name="black"><p>BLACK</p><span class='copy_content'>#000000</span></div>
+        <div copy_button="true" copy_message="HEX COPIED" class="color_cell" color_name="white"><p>WHITE</p><span class='copy_content'>#FFFFFF</span></div>
+        <div copy_button="true" copy_message="HEX COPIED" class="color_cell" color_name="energy_burst"><p>ENERGY BURST</p><span class='copy_content'>#FF9D00</span></div>
+        <div copy_button="true" copy_message="SVG COPIED" class="color_cell" color_name="black_spectrum"><p>BLACK SPECTRUM</p>
           <span class='copy_content'>
             <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="url(#paint0_linear_25_415)"/><defs><linearGradient id="paint0_linear_25_415" x1="50" y1="100" x2="50" y2="0" gradientUnits="userSpaceOnUse"><stop stop-color="#FF9D00"/><stop offset="1" stop-color="black"/></linearGradient></defs></svg>
           </span>
         </div>
-        <div copy_button="true" class="color_cell" color_name="white_spectrum"><p>WHITE SPECTRUM</p>
+        <div copy_button="true" copy_message="SVG COPIED" class="color_cell" color_name="white_spectrum"><p>WHITE SPECTRUM</p>
           <span class='copy_content'>
             <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="url(#paint0_linear_25_415)"/><defs><linearGradient id="paint0_linear_25_415" x1="50" y1="100" x2="50" y2="0" gradientUnits="userSpaceOnUse"><stop stop-color="#FF9D00"/><stop offset="1" stop-color="white"/></linearGradient></defs></svg>
           </span>
         </div>
-        <div copy_button="true"class="color_cell" color_name="grayscale"><p>GRAYSCALE</p>
+        <div copy_button="true" copy_message="SVG COPIED"class="color_cell" color_name="grayscale"><p>GRAYSCALE</p>
           <span class='copy_content'>
             <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="url(#paint0_linear_25_415)"/><defs><linearGradient id="paint0_linear_25_415" x1="50" y1="100" x2="50" y2="0" gradientUnits="userSpaceOnUse"><stop stop-color="black"/><stop offset="1" stop-color="white"/></linearGradient></defs></svg>
           </span>
         </div>
-        <button download_button="assets/global/action_area.webp" download_name="ScenePalette.png" needs_corners="true" class="viewport_button"><p>DOWNLOAD PALETTE</p><div class="spectrum"></div></button>
+        <button download_button="assets/downloads/Scene_ColorPalette.png" download_name="Scene_ColorPalette.png" needs_corners="true" class="viewport_button"><p>GET PALETTE</p><div class="spectrum"></div></button>
       </div>
     `,
   },
@@ -496,10 +487,8 @@ const openPanelData = {
     dialogue: {
       prog: 0,
       content: [
-        "This is the jobs.",
-        "It's a long story.",
-        "But it's important.",
-        "So we'll tell it.",
+        "Part experiment, part identity signal. Our job titles are riddles made to spark curiosity and conversation.",
+        "Blending nostalgic and futuristic enterprises, the Scene team exists and works within the full scope of our universe.",
       ],
     },
     html: `
@@ -849,4 +838,95 @@ const wordCategories = {
     "Roboticist",
     "Datanaut",
   ],
+};
+
+// ANALOGIE SPRITE DATA
+//
+const characterSpriteMap = {
+  // Uppercase A–M
+  A: { x: 2, y: 1, width: 4, height: 11 },
+  B: { x: 8, y: 1, width: 4, height: 11 },
+  C: { x: 14, y: 1, width: 4, height: 11 },
+  D: { x: 20, y: 1, width: 4, height: 11 },
+  E: { x: 26, y: 1, width: 4, height: 11 },
+  F: { x: 32, y: 1, width: 4, height: 11 },
+  G: { x: 38, y: 1, width: 4, height: 11 },
+  H: { x: 44, y: 1, width: 4, height: 11 },
+  I: { x: 50, y: 1, width: 4, height: 11 },
+  J: { x: 56, y: 1, width: 4, height: 11 },
+  K: { x: 62, y: 1, width: 4, height: 11 },
+  L: { x: 68, y: 1, width: 4, height: 11 },
+  M: { x: 74, y: 1, width: 4, height: 11 },
+
+  // Uppercase N–Z (Row 1)
+  N: { x: 2, y: 12, width: 4, height: 11 },
+  O: { x: 8, y: 12, width: 4, height: 11 },
+  P: { x: 14, y: 12, width: 4, height: 11 },
+  Q: { x: 20, y: 12, width: 4, height: 11 },
+  R: { x: 26, y: 12, width: 4, height: 11 },
+  S: { x: 32, y: 12, width: 4, height: 11 },
+  T: { x: 38, y: 12, width: 4, height: 11 },
+  U: { x: 44, y: 12, width: 4, height: 11 },
+  V: { x: 50, y: 12, width: 4, height: 11 },
+  W: { x: 56, y: 12, width: 4, height: 11 },
+  X: { x: 62, y: 12, width: 4, height: 11 },
+  Y: { x: 68, y: 12, width: 4, height: 11 },
+  Z: { x: 74, y: 12, width: 4, height: 11 },
+
+  // Lowercase a–m (Row 2)
+  a: { x: 2, y: 24, width: 4, height: 11 },
+  b: { x: 8, y: 24, width: 4, height: 11 },
+  c: { x: 14, y: 24, width: 4, height: 11 },
+  d: { x: 20, y: 24, width: 4, height: 11 },
+  e: { x: 26, y: 24, width: 4, height: 11 },
+  f: { x: 32, y: 24, width: 4, height: 11 },
+  g: { x: 38, y: 24, width: 4, height: 11 },
+  h: { x: 44, y: 24, width: 4, height: 11 },
+  i: { x: 50, y: 24, width: 4, height: 11 },
+  j: { x: 56, y: 24, width: 4, height: 11 },
+  k: { x: 62, y: 24, width: 4, height: 11 },
+  l: { x: 68, y: 24, width: 4, height: 11 },
+  m: { x: 74, y: 24, width: 4, height: 11 },
+
+  // Lowercase n–z (Row 3)
+  n: { x: 2, y: 35, width: 4, height: 11 },
+  o: { x: 8, y: 35, width: 4, height: 11 },
+  p: { x: 14, y: 35, width: 4, height: 11 },
+  q: { x: 20, y: 35, width: 4, height: 11 },
+  r: { x: 26, y: 35, width: 4, height: 11 },
+  s: { x: 32, y: 35, width: 4, height: 11 },
+  t: { x: 38, y: 35, width: 4, height: 11 },
+  u: { x: 44, y: 35, width: 4, height: 11 },
+  v: { x: 50, y: 35, width: 4, height: 11 },
+  w: { x: 56, y: 35, width: 4, height: 11 },
+  x: { x: 62, y: 35, width: 4, height: 11 },
+  y: { x: 68, y: 35, width: 4, height: 11 },
+  z: { x: 74, y: 35, width: 4, height: 11 },
+
+  // Numbers 1–9, 0 (Row 4)
+  1: { x: 2, y: 45, width: 4, height: 11 },
+  2: { x: 8, y: 45, width: 4, height: 11 },
+  3: { x: 14, y: 45, width: 4, height: 11 },
+  4: { x: 20, y: 45, width: 4, height: 11 },
+  5: { x: 26, y: 45, width: 4, height: 11 },
+  6: { x: 32, y: 45, width: 4, height: 11 },
+  7: { x: 38, y: 45, width: 4, height: 11 },
+  8: { x: 44, y: 45, width: 4, height: 11 },
+  9: { x: 50, y: 45, width: 4, height: 11 },
+  0: { x: 56, y: 45, width: 4, height: 11 },
+
+  // Symbols (Row 5)
+  "▤": { x: 2, y: 57, width: 7, height: 11 },
+  "■": { x: 11, y: 57, width: 4, height: 11 },
+  "•": { x: 17, y: 57, width: 4, height: 11 },
+  "←": { x: 23, y: 57, width: 6, height: 11 },
+  "→": { x: 31, y: 57, width: 6, height: 11 },
+  ".": { x: 39, y: 57, width: 1, height: 11 },
+  "/": { x: 42, y: 57, width: 3, height: 11 },
+  "-": { x: 47, y: 57, width: 4, height: 11 },
+  "'": { x: 53, y: 57, width: 1, height: 11 },
+  "@": { x: 56, y: 57, width: 4, height: 11 },
+  ",": { x: 62, y: 57, width: 2, height: 11 },
+  '"': { x: 66, y: 57, width: 3, height: 11 },
+  ":": { x: 71, y: 57, width: 3, height: 11 },
 };
