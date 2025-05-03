@@ -30,7 +30,6 @@ function setupCustomSlider(
     const [snappedVal, isSnapped] = maybeSnap(value);
     if (isSnapped) {
       fill.classList.add("snapped");
-      navigator.vibrate(200);
       setTimeout(() => {
         fill.classList.remove("snapped");
       }, 200);
@@ -491,4 +490,101 @@ function fadeVideoVolume(videoEl, startVolume, endVolume, durationMs) {
       clearInterval(mainAudioInterval);
     }
   }, intervalTime);
+}
+
+// JOB TITLE IMAGE GEN
+
+async function renderJobTitleImage_Scene({
+  canvasId = "jobCanvas",
+  imagePath = "assets/downloads/Scene_JobTitle_Base.webp?1",
+  fontConfig = {
+    past: { font: "550px DownloadAnalogie", color: "#ff9900" },
+    future: { font: "550px Instrument", color: "#ffffff" },
+  },
+  textPosition = {
+    leftX: 335,
+    topY: 500,
+    bottomY: 1080,
+  },
+  download = true,
+  outputFilename = "Scene_JobTitle.png",
+} = {}) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) {
+    console.error(
+      `[renderJobTitleImage_Scene] Canvas element not found: ${canvasId}`,
+    );
+    return;
+  }
+
+  const jobData = jobTitles;
+
+  const ctx = canvas.getContext("2d");
+
+  // Force font load before drawing
+  await document.fonts.load(fontConfig.past.font);
+  await document.fonts.load(fontConfig.future.font);
+
+  const _loadSceneImage = (src) =>
+    new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = (e) => reject(e);
+      img.src = src;
+    });
+
+  // Load background image
+  const sceneBg = await _loadSceneImage(imagePath);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(sceneBg, 0, 0, canvas.width, canvas.height);
+
+  // Draw text
+  const _hasDescenders = (text) => /[gjpqy]/.test(text);
+
+  const topWord = jobData[0];
+  const secondWord = jobData[1];
+
+  const SPACING = {
+    futureTopOffset: 60,
+    futureBottomTighten: -70,
+    descenderPadding: 80,
+    safariOffset: -150,
+  };
+
+  const isFutureTop = topWord.type === "future";
+  const hasDescenders = _hasDescenders(topWord.title);
+  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  const safariInstrumentYOffset = isSafari ? SPACING.safariOffset : 0;
+
+  const topOffset = isFutureTop ? SPACING.futureTopOffset : 0;
+  const bottomOffset =
+    (isFutureTop ? SPACING.futureBottomTighten : 0) +
+    (isFutureTop && hasDescenders ? SPACING.descenderPadding : 0);
+
+  const topY = textPosition.topY + topOffset;
+  const bottomY = textPosition.bottomY + bottomOffset;
+
+  for (let i = 0; i < jobData.length; i++) {
+    const { title, type } = jobData[i];
+    const font = fontConfig[type]?.font || "600px sans-serif";
+    const color = fontConfig[type]?.color || "#ffffff";
+    const y =
+      (i === 0 ? topY : bottomY) +
+      (type === "future" ? safariInstrumentYOffset : 0); // Safari adjustment
+
+    ctx.font = font;
+    ctx.fillStyle = color;
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+
+    ctx.fillText(title, textPosition.leftX, y);
+  }
+
+  // Optional download
+  if (download) {
+    const link = document.createElement("a");
+    link.download = outputFilename;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  }
 }
