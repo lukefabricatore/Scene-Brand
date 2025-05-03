@@ -77,6 +77,17 @@ video:fullscreen {
     font-family: "Scene Runes";
     src: url("assets/global/scene_runes.ttf");
 }
+
+@font-face {
+    font-family: "DownloadAnalogie";
+    src: url("assets/global/analogie.ttf") format("truetype");
+}
+@font-face {
+    font-family: "Instrument";
+    src: url("assets/global/instrument_export.ttf")
+        format("truetype");
+}
+
 h3 {
     margin: 0;
     font-family: "Instrument Sans";
@@ -2169,6 +2180,7 @@ body[data-captions="false"] #textbox_container {
 #textbox_container canvas {
     background: #000;
     image-rendering: pixelated;
+    image-rendering: crisp-edges;
     display: block;
     width: 100%;
 }

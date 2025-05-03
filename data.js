@@ -831,7 +831,7 @@ const wordCategories = {
     "HoloSmith",
     "Starforger",
     "Chronomancer",
-    "Astrocartographer",
+    "Astronaut",
     "Nanodesigner",
     "Whisperer",
     "Technosmith",

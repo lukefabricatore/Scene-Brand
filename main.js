@@ -463,6 +463,11 @@ function setupJobs() {
       replaceJobTitles();
     });
   replaceJobTitles(true);
+  panel
+    .querySelector(".inline_button:nth-child(1)")
+    .addEventListener("click", function () {
+      renderJobTitleImage_Scene();
+    });
 }
 
 function setupRunes() {
