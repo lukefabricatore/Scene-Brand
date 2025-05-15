@@ -7,6 +7,9 @@ window.addEventListener("DOMContentLoaded", function () {
   const captionsPref = getCookie("captions");
   if (captionsPref === false)
     document.body.setAttribute("data-captions", "false");
+  setTimeout(function () {
+    document.getElementById("loadingmessage").classList.add("ready");
+  }, 200);
 });
 
 window.addEventListener("resize", function () {
@@ -518,6 +521,17 @@ function setupVideoInitial() {
       videoAspected = false;
     }
   });
+}
+
+function setupBackstory() {
+  const panel = document.querySelector(".panel#backstory");
+  const video = panel.querySelector("video");
+  video.volume = 0;
+  video.muted = false;
+  fadeVideoVolume(video, 0, 1, 300);
+  document
+    .querySelector("#backstory_container .exit_btn")
+    .addEventListener("click", resetGrid);
 }
 
 // TAB BUTTONS

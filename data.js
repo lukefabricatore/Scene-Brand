@@ -28,8 +28,8 @@ const gridItems = [
       mob: { size: [5, 2], pos: [0, 0], endPos: [0, -6] },
     },
     open: {
-      desk: [650, 300],
-      mob: [650, 300],
+      desk: [600, 540],
+      mob: [600, 540],
     },
     content: {
       background: "white",
@@ -216,7 +216,7 @@ const gridItems = [
       html: `
       <div id="main_video_container">
         <div class="video_inner">
-          <video playsinline autoplay loop muted id="main_video" src="assets/thumbnails/brandvideo.mp4" poster="https://example.com/poster.jpg"></video>
+          <video playsinline autoplay loop muted id="main_video" src="assets/thumbnails/brandvideo.mp4"></video>
         </div>
       </div>
       `,
@@ -281,6 +281,15 @@ const openPanelData = {
     dialogue: {
       prog: 0,
       content: [],
+    },
+    html: `
+      <div needs_corners="true" id="backstory_container">
+        <button class="exit_btn chip"><h3>X</h3></button>
+        <video src="assets/global/backstory.mp4" muted controls autoplay playsinline controlsList="nofullscreen"></video>
+      </div>
+    `,
+    action: function () {
+      setupBackstory();
     },
   },
   instrument: {
